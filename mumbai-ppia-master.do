@@ -43,7 +43,7 @@ global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
   hashdata "${rawdata}/SP1_4_Wave0.dta" ///
      using "${directory}/data/sp-private-1.dta" , replace reset
 
-     use "${directory}/data/sp-private-1.dta"
+     use "${directory}/data/sp-private-1.dta" , clear
      lab var sp1_h_16_given "Alcohol History"
      save "${directory}/data/sp-private-1.dta" , replace
 
