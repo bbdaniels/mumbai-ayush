@@ -41,17 +41,20 @@ global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
   qui run "${directory}/hashdata/hashdata.ado"
 
   hashdata "${rawdata}/SP1_4_Wave0.dta" ///
-     using "${directory}/data/sp-private-1.dta" , replace reset
+     using "${directory}/data/sp-private-0.dta" , replace reset
 
-     use "${directory}/data/sp-private-1.dta" , clear
+     use "${directory}/data/sp-private-0.dta" , clear
      lab var sp1_h_16_given "Alcohol History"
-     save "${directory}/data/sp-private-1.dta" , replace
+     save "${directory}/data/sp-private-0.dta" , replace
 
   hashdata "${rawdata}/SP1_4_Wave1.dta" ///
+     using "${directory}/data/sp-private-1.dta" , replace reset
+
+  hashdata "${rawdata}/SP1_4_Wave2.dta" ///
      using "${directory}/data/sp-private-2.dta" , replace reset
 
 // Part 2: Build constructed data from raw data
-
+-
   do "${directory}/code/construct.do"
 
 // Part 3: Analysis
