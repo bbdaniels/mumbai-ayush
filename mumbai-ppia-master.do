@@ -4,7 +4,7 @@
 global rawdata "/Users/bbdaniels/Box Sync/Papers/Ruchika PPIA/"
 global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
 
-// Globals
+// Globals -------------------------------------------------------------------------------------
 
   // title
   global title justification(left) color(black) span pos(11)
@@ -35,7 +35,7 @@ global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
   global bar lc(white) lw(thin) la(center) fi(100) // ← Remove la(center) for Stata < 15
 
 
-// Part 1: Load datafiles into Git location
+// Part 1: Load datafiles into Git location ----------------------------------------------------
 
   // Hashdata command to import data from remote repository
   qui run "${rawdata}/ado/iecodebook.ado"
@@ -49,11 +49,11 @@ global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
      , replace reset copy hash text
 
 
-// Part 2: Build constructed data from raw data
--
+// Part 2: Build constructed data from raw data ------------------------------------------------
+
   do "${directory}/code/construct.do"
 
-// Part 3: Analysis
+// Part 3: Analysis ----------------------------------------------------------------------------
 
 *  do "${directory}/code/analysis.do"
 
