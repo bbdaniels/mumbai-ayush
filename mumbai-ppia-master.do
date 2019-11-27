@@ -1,7 +1,7 @@
 // Master file for Mumbai Public Sector analysis
 
 // Set global directory locations
-global rawdata "/Users/bbdaniels/Box Sync/Qutub/MUMBAI ANALYSIS/constructed"
+global rawdata "/Users/bbdaniels/Box Sync/Papers/Ruchika PPIA/"
 global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
 
 // Globals
@@ -38,20 +38,16 @@ global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
 // Part 1: Load datafiles into Git location
 
   // Hashdata command to import data from remote repository
-  qui run "${directory}/hashdata/hashdata.ado"
+  qui run "${rawdata}/ado/iecodebook.ado"
 
-  hashdata "${rawdata}/SP1_4_Wave0.dta" ///
-     using "${directory}/data/sp-private-0.dta" , replace reset
+  iecodebook export "${rawdata}/data/sp-wave-0.dta" ///
+     using "${directory}/data/sp-wave-0.dta" ///
+     , replace reset copy hash text
 
-     use "${directory}/data/sp-private-0.dta" , clear
-     lab var sp1_h_16_given "Alcohol History"
-     save "${directory}/data/sp-private-0.dta" , replace
+  iecodebook export "${rawdata}/data/sp-wave-1.dta" ///
+     using "${directory}/data/sp-wave-1.dta" ///
+     , replace reset copy hash text
 
-  hashdata "${rawdata}/SP1_4_Wave1.dta" ///
-     using "${directory}/data/sp-private-1.dta" , replace reset
-
-  hashdata "${rawdata}/SP1_4_Wave2.dta" ///
-     using "${directory}/data/sp-private-2.dta" , replace reset
 
 // Part 2: Build constructed data from raw data
 -
