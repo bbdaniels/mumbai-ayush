@@ -29,7 +29,7 @@ qui append using ///
 // Cleaning ------------------------------------------------------------------------------------
 
 drop sample
-drop if qutub_sample > 6
+keep if qutub_sample > 6
 
 lab var correct "Correct"
 lab var dr_4 "Referral"
@@ -41,7 +41,7 @@ lab var dr_4 "Referral"
   }
 
 iecodebook export ///
-  using "${directory}/constructed/sp-data.dta" ///
+  using "${directory}/constructed/sp-ayush.dta" ///
   , copy hash reset replace text
 
 // End of dofile
