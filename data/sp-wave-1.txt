@@ -1,6 +1,6 @@
 
 Variable       Obs Unique       Mean        Min       Max  Label
----------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 qutub_id      2231    687          .          .         .  Facility ID
 qutub_id_p~r  2231    692          .          .         .  Provider ID
 qutub_sample  2231      6   5.562976          1         9  Sample Type
@@ -266,7 +266,7 @@ med_k_any_9   2231      2   .1255043          0         1  Steroids
 med_k_any_10  2231      2   .1918422          0         1  Med Code: Any Anti-allergy medicines
 med_k_any_11  2231      2   .0040341          0         1  Med Code: Any Cardiac medication
 med_k_any_12  2231      2   .0228597          0         1  Med Code: Any Psychiatric/ neural medicines
-med_k_any_13  2231      2   .1156432          0         1  Med Code: Any Identified as anther type of medica...
+med_k_any_13  2231      2   .1156432          0         1  Med Code: Any Identified as anther type of medication
 med_k_any_14  2231      1          0          0         0  Med Code: Any Household remedies
 med_k_any_15  2231      2   .0017929          0         1  Med Code: Any NSAIDS
 med_k_any_16  2231      2   .2720753          0         1  Med Code: Any Cough Syrups
@@ -686,4 +686,4 @@ time_total    2199    192   37.68713       -439       715  Time in Clinic (min)
 time_waiting  2194   1628   33.41125  -451.3667  710.6667  Time Waiting (min)
 uatbc_faci~e   503    144   242128.8     113103    325222  Parent Agency Id
 uatbc_prov~d   469    149   213883.4     103242    325222  Agency Id
----------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

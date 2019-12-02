@@ -42,11 +42,11 @@ global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
 
   iecodebook export "${rawdata}/data/sp-wave-0.dta" ///
      using "${directory}/data/sp-wave-0.dta" ///
-     , replace reset copy hash text
+     , replace copy hash text
 
   iecodebook export "${rawdata}/data/sp-wave-1.dta" ///
      using "${directory}/data/sp-wave-1.dta" ///
-     , replace reset copy hash text
+     , replace copy hash text
 
 
 // Part 2: Build constructed data from raw data ------------------------------------------------
