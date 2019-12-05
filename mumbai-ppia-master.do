@@ -1,8 +1,8 @@
 // Master file for Mumbai Public Sector analysis
 
 // Set global directory locations
-global rawdata "/Users/bbdaniels/Box Sync/Papers/Ruchika PPIA/"
-global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
+global rawdata "/Users/RuchikaBhatia/Box Sync/Ruchika PPIA"
+global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 
 // Globals -------------------------------------------------------------------------------------
 
