@@ -1,6 +1,6 @@
 
 Variable       Obs Unique       Mean        Min       Max  Label
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
 qutub_any_~l   999      1          0          0         0  Recieved NNL List from PATH
 qutub_apple      0      0          .          .         .  Apple hub walk-in
 qutub_char~e     0      0          .          .         .  charitable_path
@@ -16,7 +16,7 @@ qutub_netp~0     0      0          .          .         .  PPIA Provider
 qutub_netw~0   999      2   .1741742          0         1  Networked for Wave 0
 qutub_nnl        0      0          .          .         .  Networked provider at other location
 qutub_nonn~d     0      0          .          .         .  Provider seen is a non-networked doctor
-qutub_prov~d     0      0          .          .         .  QUTUBID for provider seen from tracking and form data
+qutub_prov~d     0      0          .          .         .  QUTUBID for provider seen from tracking and form...
 qutub_pxh        0      0          .          .         .  Networked provider at networked location
 qutub_sample  2428      3   7.580725          7         9  Sample Type
 qutub_samp~1   998      1          0          0         0  Non-PPIA Facility Walk-In
@@ -658,4 +658,4 @@ sp7_id_3       476      2   .0609244          0         1  Breathing Education
 uatbc_faci~e   301    101     216644     121661    229423  Parent Agency Id
 uatbc_prov~d   301    101     216644     121661    229423  Agency Id
 engaged       2428      2    .416804          0         1  
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------

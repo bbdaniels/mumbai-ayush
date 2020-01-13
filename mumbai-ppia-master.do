@@ -6,6 +6,8 @@ global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 
 // Globals -------------------------------------------------------------------------------------
 
+
+ 
   // title
   global title justification(left) color(black) span pos(11)
 
@@ -51,7 +53,7 @@ global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 
 // Part 2: Build constructed data from raw data ------------------------------------------------
 
-  // do "${directory}/code/construct.do"
+*  do "${directory}/code/construct.do"
 
 // Part 3: Analysis ----------------------------------------------------------------------------
 
