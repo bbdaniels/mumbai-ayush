@@ -145,4 +145,91 @@ putexcel G8:I8="Sample: AYUSH PPIA", merge font(calibri,13) bold underline
 putexcel G14:I14="Sample: AYUSH Trial Control", merge font(calibri,13) bold underline
 putexcel G20:J20="Sample: AYUSH Trial Treatment", merge font(calibri,13) bold underline
 
+//Creating balance tables
+
+ssc install ietoolkit
+
+ssc install betterbar
+
+ssc install forest
+
+
+
+use "/Users/RuchikaBhatia/GitHub/mumbai-ppia/data/sp-both.dta", clear
+
+keep if qutub_sample >= 7
+
+clonevar qutub_sample_updated=qutub_sample
+recode qutub_sample_updated (7=10) if trial_assignment==0
+	lab def qutub_sample 10 "Control" , modify
+recode qutub_sample_updated 7=11 if trial_assignment==1
+	lab def qutub_sample 11 "Treatment" , modify
+	
+replace qutub_sample_updated = 8 if qutub_sample_updated == 7
+
+
+
+/// Balance tables Include correct case management?
+
+putexcel set "${directory}/outputs/balance_tables_2.xlsx", replace
+local j=3
+
+forvalues i=1/7{
+	logistic ce_`i' trial_assignment
+	putexcel C`j' = etable
+	local j=`j'+2
+}
+
+local row=5
+forvalues i=1/7{
+	putexcel C`row':I`row', nformat(";;;")
+	local row=`row'+2
+}
+
+local row=4
+foreach x in ce_1 ce_2 ce_3 ce_4 ce_5 ce_6 ce_7{
+	describe `x'
+	local varlabel : var label `x'
+	putexcel B`row':C`row' = ("`varlabel'"), merge
+	local row=`row'+2
+}
+
+putexcel D3:I17, border(all)
+
+putexcel B3:B17, border(left)
+putexcel B3:B17, border(bottom)
+putexcel B3:B17, border(top)
+putexcel H3:I3, merge
+putexcel C16, border(bottom)
+putexcel B3:I3 B17:I17, fpattern(solid, "128 128 128")
+
+local row=4
+forvalues i=1/7{
+	putexcel B`row', fpattern(solid, "192 192 192")
+	local row=`row'+2
+}
+
+local row=3
+forvalues i=1/7{
+	putexcel B`row':C`row'="", merge
+	local row=`row'+2
+}
+ 
+putexcel D3:I3, hcenter
+
+//Graphing out balance table
+label define trial_assignmentlbl 0 Control 1 Treatment, modify
+
+label values trial_assignment trial_assignmentlbl
+
+forest logit (ce_1 ce_2 ce_3 ce_4 ce_5 ce_6 ce_7) , t(trial_assignment) or
+
+graph save "Graph" "${directory}/outputs/BalanceTable_Graph.gph"
+
+
+
+//iebaltab i.ce_1  if wave==0, grpvar(trial_assignment) save("${directory}/outputs/balance_tables_2.xlsx") rowvarlabels
+
+
+
 
