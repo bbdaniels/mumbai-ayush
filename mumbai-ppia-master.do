@@ -4,10 +4,18 @@
 global rawdata "/Users/RuchikaBhatia/Box Sync/Ruchika PPIA"
 global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 
+// Install packages ------------------------------------------------------------------------------
+
+  net install "http://www.stata.com/users/kcrow/tab2xl", replace
+  ssc install tabcount
+  ssc install ietoolkit
+  ssc install betterbar
+  ssc install forest
+
 // Globals -------------------------------------------------------------------------------------
 
 
- 
+
   // title
   global title justification(left) color(black) span pos(11)
 

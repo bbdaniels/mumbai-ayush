@@ -1,14 +1,3 @@
-/// Install Packages 
-net install http://www.stata.com/users/kcrow/tab2xl, replace
-
-ssc install tabcount
-
-ssc install ietoolkit
-
-ssc install betterbar
-
-ssc install forest
-
 ///Load data
 
 use "${directory}/constructed/sp_both.dta", clear
@@ -26,12 +15,12 @@ forvalues i = 8/11 {
 		tab2xl case if qutub_sample_updated == `i' & wave == 1 ///
 			using "${directory}/outputs/sp_case_tabs.xlsx" , col(6) row(`row')
 		putexcel B`row2' = "Wave-0", hcenter bold
-		putexcel G`row2' = "Wave-1", hcenter bold 
+		putexcel G`row2' = "Wave-1", hcenter bold
 		local row2 = `row2'+12
 		local row = `row'+12
 		}
-		
-	
+
+
 putexcel D2:F2 = "SP cases for each sample" ///
 	, merge font(calibri,13) bold underline
 putexcel D2:F2 = " Sample: AYUSH NON-PPIA" ///
@@ -55,12 +44,12 @@ keep qutub_id case wave qutub_sample_updated
 			drop is_`i'
 		}
 	}
-	
+
 // Keeping one of each ID
 sort qutub_id case
 egen tag = tag(qutub_id)
 keep if tag == 1
-	
+
 // Calculating crosstabs of visits for each case and sample
 local row = 2
 local rowinc = 3
@@ -68,20 +57,20 @@ local rowinc = 3
 foreach sample in 8 9 10 11 {
 		forv i = 1/4 {
 		dis "`sample'_`i'"
-		
+
 			tabcount has`i'_0 has`i'_1, v1(0/1) v2(0/1) zero ///
 			, if qutub_sample_updated == `sample' ///
 			, matrix(s`sample'_`i')
-			
+
 			matrix rownames s`sample'_`i' = "Wave0-No" "Wave0-Yes"
-				matrix colnames s`sample'_`i' = "Wave1-No" "Wave1-Yes" 
+				matrix colnames s`sample'_`i' = "Wave1-No" "Wave1-Yes"
 			}
 			}
-		
-		
-//Saving crosstabs in excel 		
-putexcel set "${directory}/outputs/sp_crosstabs.xlsx", modify 
- 
+
+
+//Saving crosstabs in excel
+putexcel set "${directory}/outputs/sp_crosstabs.xlsx", modify
+
 local row = 4
 forvalues j = 8/11{
 	local ncol = 1
@@ -93,7 +82,7 @@ forvalues j = 8/11{
 		}
 		local row = `row'+6
 		}
- 
+
  local row1 = 4
  local row2 = 6
  forvalues j = 1/4{
@@ -103,15 +92,15 @@ forvalues j = 8/11{
 		local col1: word `ncol1' of `c(ALPHA)'
 		local col2: word `ncol2' of `c(ALPHA)'
 		putexcel `col1'`row1':`col2'`row2' ///
-		, fpattern(solid, "192 192 192") border(all) 
+		, fpattern(solid, "192 192 192") border(all)
 		local ncol1 = `ncol1'+4
 		local ncol2 = `ncol2'+4
 		}
-		
+
 		local row1 = `row1'+6
 		local row2 = `row2'+6
 		}
-		
+
 local row1 = 5
 local row2 = 6
 forvalues j = 1/4{
@@ -121,14 +110,14 @@ forvalues j = 1/4{
 		local col1: word `ncol1' of `c(ALPHA)'
 		local col2: word `ncol2' of `c(ALPHA)'
 		putexcel `col1'`row1':`col2'`row2' ///
-		, fpattern(none) border(all) 
+		, fpattern(none) border(all)
 		local ncol1 = `ncol1'+4
 		local ncol2 = `ncol2'+4
 		}
 		local row1 = `row1'+6
 		local row2 = `row2'+6
-		}		
-		
+		}
+
 putexcel G2:I2=" Sample: AYUSH NON-PPIA" ///
 	, merge font(calibri,13) bold underline
 putexcel G8:I8="Sample: AYUSH PPIA" ///
@@ -138,7 +127,7 @@ putexcel G14:I14="Sample: AYUSH Trial Control" ///
 putexcel G20:J20="Sample: AYUSH Trial Treatment" ///
 	, merge font(calibri,13) bold underline
 
-// Creating Balance Tables 
+// Creating Balance Tables
 
 use "${directory}/constructed/sp_both.dta", clear
 
@@ -171,9 +160,9 @@ iebaltab ///
 	med_l_any_3 med_k_any_9 ///
 		, grpvar(trial_assignment) control(1) covariates(i.case) vce(cluster qutub_id) ///
 				replace rowvarlabel ///
-					save("${directory}/outputs/balance_table.xlsx") 
-			
-				
+					save("${directory}/outputs/balance_table.xlsx")
+
+
 putexcel set "${directory}/outputs/balance_table.xlsx", modify
 
 putexcel A4:F17 , fpattern(solid, "204 255 255 ") border(all)
@@ -184,9 +173,9 @@ putexcel H4, fpattern(solid, "204 255 255 ") border(all)
 putexcel H5, fpattern(solid, "204 255 204 ") border(all)
 putexcel H6, fpattern(solid, "255 255 153 ") border(all)
 
-putexcel I4:J4="Balance variable", merge 
-putexcel I5:J5="Process Indicator", merge 
-putexcel I6:J6="Quality Outcome", merge 
+putexcel I4:J4="Balance variable", merge
+putexcel I5:J5="Process Indicator", merge
+putexcel I6:J6="Quality Outcome", merge
 
 /// Graph of balance tables
 
@@ -218,15 +207,3 @@ graph export "${directory}/outputs/Quality_Outcomes.eps", replace
 
 
 ---
-
-
-
-
-
-
-
-			
-
-
-
-
