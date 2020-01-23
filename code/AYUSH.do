@@ -1,61 +1,47 @@
-use "/Users/RuchikaBhatia/GitHub/mumbai-ppia/data/sp-wave-0.dta", clear
-gen wave=0
-append using "/Users/RuchikaBhatia/GitHub/mumbai-ppia/data/sp-wave-1.dta" , force
-replace wave=1 if wave==.
-
-save "/Users/RuchikaBhatia/GitHub/mumbai-ppia/data/sp-both.dta" , replace
-
-use "/Users/RuchikaBhatia/GitHub/mumbai-ppia/data/sp-both.dta", clear
-
-//Installing packages 
+/// Install Packages 
 net install http://www.stata.com/users/kcrow/tab2xl, replace
+
 ssc install tabcount
 
+ssc install ietoolkit
 
+ssc install betterbar
 
+ssc install forest
 
-//Modifying case label
-label define case 7 "SP7", add
-label values case case
+///Load data
 
-
-// Creating different group for AYUSH_trial control and treatment 
-keep if qutub_sample >= 7
-
-clonevar qutub_sample_updated=qutub_sample
-recode qutub_sample_updated (7=10) if trial_assignment==0
-	lab def qutub_sample 10 "Treatment" , modify
-recode qutub_sample_updated 7=11 if trial_assignment==1
-	lab def qutub_sample 11 "Control" , modify
-	
-replace qutub_sample_updated = 8 if qutub_sample_updated == 7
-
-
+use "${directory}/constructed/sp_both.dta", clear
 
 // Tabulating SP cases in qutub_sample_updated in wave 0 and 1
 
-local row=6
-local row2=4
+local row = 6
+local row2 = 4
 
-putexcel set "${directory}/outputs/sp_case_tabs.xlsx", modify
+putexcel set "${directory}/outputs/sp_case_tabs.xlsx", replace
 
-forvalues i=8/11{
-		tab2xl case if qutub_sample_updated==`i' & wave==0 using "${directory}/outputs/sp_case_tabs.xlsx" , col(1) row(`row')
-		tab2xl case if qutub_sample_updated==`i' & wave==1 using "${directory}/outputs/sp_case_tabs.xlsx" , col(6) row(`row')
-		putexcel B`row2'="Wave-0", hcenter bold
-		putexcel G`row2'="Wave-1", hcenter bold 
-		local row2=`row2'+12
-		local row=`row'+12
+forvalues i = 8/11 {
+		tab2xl case if qutub_sample_updated == `i' & wave == 0 ///
+			using "${directory}/outputs/sp_case_tabs.xlsx" , col(1) row(`row')
+		tab2xl case if qutub_sample_updated == `i' & wave == 1 ///
+			using "${directory}/outputs/sp_case_tabs.xlsx" , col(6) row(`row')
+		putexcel B`row2' = "Wave-0", hcenter bold
+		putexcel G`row2' = "Wave-1", hcenter bold 
+		local row2 = `row2'+12
+		local row = `row'+12
 		}
 		
 	
-putexcel D2:F2="SP cases for each sample", merge font(calibri,13) bold underline
-putexcel D2:F2=" Sample: AYUSH NON-PPIA", merge font(calibri,13) bold underline
-putexcel D14:F14="Sample: AYUSH PPIA", merge font(calibri,13) bold underline
-putexcel D26:F26="Sample: AYUSH Trial Control", merge font(calibri,13) bold underline
-putexcel D38:G38="Sample: AYUSH Trial Treatment", merge font(calibri,13) bold underline
-
-
+putexcel D2:F2 = "SP cases for each sample" ///
+	, merge font(calibri,13) bold underline
+putexcel D2:F2 = " Sample: AYUSH NON-PPIA" ///
+	, merge font(calibri,13) bold underline
+putexcel D14:F14 = "Sample: AYUSH PPIA" ///
+	, merge font(calibri,13) bold underline
+putexcel D26:F26 = "Sample: AYUSH Trial Control" ///
+	, merge font(calibri,13) bold underline
+putexcel D38:G38 = "Sample: AYUSH Trial Treatment" ///
+	, merge font(calibri,13) bold underline
 
 // Tracking cases across rounds
 
@@ -76,159 +62,170 @@ egen tag = tag(qutub_id)
 keep if tag == 1
 	
 // Calculating crosstabs of visits for each case and sample
-local row=2
-local rowinc=3
-cap erase "${directory}/outputs/sp_crosstabs.xlsx"
+local row = 2
+local rowinc = 3
+
 foreach sample in 8 9 10 11 {
 		forv i = 1/4 {
 		dis "`sample'_`i'"
 		
-			tabcount has`i'_0 has`i'_1, v1(0/1) v2(0/1) zero , if qutub_sample_updated == `sample' ///
+			tabcount has`i'_0 has`i'_1, v1(0/1) v2(0/1) zero ///
+			, if qutub_sample_updated == `sample' ///
 			, matrix(s`sample'_`i')
 			
-			matrix rownames s`sample'_`i'="Wave0-No" "Wave0-Yes"
-				matrix colnames s`sample'_`i'="Wave1-No" "Wave1-Yes" 
+			matrix rownames s`sample'_`i' = "Wave0-No" "Wave0-Yes"
+				matrix colnames s`sample'_`i' = "Wave1-No" "Wave1-Yes" 
 			}
 			}
 		
 		
-//Saving crosstabs in an excel 		
+//Saving crosstabs in excel 		
 putexcel set "${directory}/outputs/sp_crosstabs.xlsx", modify 
  
- local row=4
- forvalues j=8/11{
-	local ncol=1
-	forvalues i=1/4{
+local row = 4
+forvalues j = 8/11{
+	local ncol = 1
+	forvalues i = 1/4{
 		local col: word `ncol' of `c(ALPHA)'
-		putexcel `col'`row'= "SP`i'"
-		putexcel `col'`row'= matrix(s`j'_`i'), names
-		local ncol=`ncol'+4
+		putexcel `col'`row' = "SP`i'"
+		putexcel `col'`row' = matrix(s`j'_`i'), names
+		local ncol = `ncol'+4
 		}
-		local row=`row'+6
+		local row = `row'+6
 		}
  
- local row1=4
- local row2=6
- forvalues j=1/4{
-	local ncol1=1
-	local ncol2=3
-	forvalues i=1/4{
+ local row1 = 4
+ local row2 = 6
+ forvalues j = 1/4{
+	local ncol1 = 1
+	local ncol2 = 3
+	forvalues i = 1/4{
 		local col1: word `ncol1' of `c(ALPHA)'
 		local col2: word `ncol2' of `c(ALPHA)'
-		putexcel `col1'`row1':`col2'`row2', fpattern(solid, "192 192 192") border(all) 
-		local ncol1=`ncol1'+4
-		local ncol2=`ncol2'+4
+		putexcel `col1'`row1':`col2'`row2' ///
+		, fpattern(solid, "192 192 192") border(all) 
+		local ncol1 = `ncol1'+4
+		local ncol2 = `ncol2'+4
 		}
 		
-		local row1=`row1'+6
-		local row2=`row2'+6
+		local row1 = `row1'+6
+		local row2 = `row2'+6
 		}
 		
-local row1=5
-local row2=6
-forvalues j=1/4{
-	local ncol1=2
-	local ncol2=3
-	forvalues i=1/4{
+local row1 = 5
+local row2 = 6
+forvalues j = 1/4{
+	local ncol1 = 2
+	local ncol2 = 3
+	forvalues i = 1/4{
 		local col1: word `ncol1' of `c(ALPHA)'
 		local col2: word `ncol2' of `c(ALPHA)'
-		putexcel `col1'`row1':`col2'`row2', fpattern(none) border(all) 
-		local ncol1=`ncol1'+4
-		local ncol2=`ncol2'+4
+		putexcel `col1'`row1':`col2'`row2' ///
+		, fpattern(none) border(all) 
+		local ncol1 = `ncol1'+4
+		local ncol2 = `ncol2'+4
 		}
-		local row1=`row1'+6
-		local row2=`row2'+6
+		local row1 = `row1'+6
+		local row2 = `row2'+6
 		}		
 		
-putexcel G2:I2=" Sample: AYUSH NON-PPIA", merge font(calibri,13) bold underline
-putexcel G8:I8="Sample: AYUSH PPIA", merge font(calibri,13) bold underline
-putexcel G14:I14="Sample: AYUSH Trial Control", merge font(calibri,13) bold underline
-putexcel G20:J20="Sample: AYUSH Trial Treatment", merge font(calibri,13) bold underline
+putexcel G2:I2=" Sample: AYUSH NON-PPIA" ///
+	, merge font(calibri,13) bold underline
+putexcel G8:I8="Sample: AYUSH PPIA" ///
+	, merge font(calibri,13) bold underline
+putexcel G14:I14="Sample: AYUSH Trial Control" ///
+	, merge font(calibri,13) bold underline
+putexcel G20:J20="Sample: AYUSH Trial Treatment" ///
+	, merge font(calibri,13) bold underline
 
-//Creating balance tables
+// Creating Balance Tables 
 
-ssc install ietoolkit
-
-ssc install betterbar
-
-ssc install forest
-
-
-
-use "/Users/RuchikaBhatia/GitHub/mumbai-ppia/data/sp-both.dta", clear
-
-keep if qutub_sample >= 7
-
-clonevar qutub_sample_updated=qutub_sample
-recode qutub_sample_updated (7=10) if trial_assignment==0
-	lab def qutub_sample 10 "Control" , modify
-recode qutub_sample_updated 7=11 if trial_assignment==1
-	lab def qutub_sample 11 "Treatment" , modify
-	
-replace qutub_sample_updated = 8 if qutub_sample_updated == 7
+use "${directory}/constructed/sp_both.dta", clear
 
 
+foreach var of varlist g_6-g_10 {
+		recode `var' (1 2 = 0)(3 = 1)
+		}
 
-/// Balance tables Include correct case management?
+separate correct, by(case)
 
-putexcel set "${directory}/outputs/balance_tables_2.xlsx", replace
-local j=3
-
-forvalues i=1/7{
-	logistic ce_`i' trial_assignment
-	putexcel C`j' = etable
-	local j=`j'+2
+forvalues i= 1/4  {
+	label variable correct`i' Case`i'
 }
 
-local row=5
-forvalues i=1/7{
-	putexcel C`row':I`row', nformat(";;;")
-	local row=`row'+2
-}
+drop correct7
 
-local row=4
-foreach x in ce_1 ce_2 ce_3 ce_4 ce_5 ce_6 ce_7{
-	describe `x'
-	local varlabel : var label `x'
-	putexcel B`row':C`row' = ("`varlabel'"), merge
-	local row=`row'+2
-}
+clonevar cb1 = correct if cp_18 == 1
+clonevar cb2 = correct if cp_18 == 0
 
-putexcel D3:I17, border(all)
+label variable cb1 "Male Provider & Correct Manag."
+label variable cb2 "Female Provider & Correct Manag."
 
-putexcel B3:B17, border(left)
-putexcel B3:B17, border(bottom)
-putexcel B3:B17, border(top)
-putexcel H3:I3, merge
-putexcel C16, border(bottom)
-putexcel B3:I3 B17:I17, fpattern(solid, "128 128 128")
-
-local row=4
-forvalues i=1/7{
-	putexcel B`row', fpattern(solid, "192 192 192")
-	local row=`row'+2
-}
-
-local row=3
-forvalues i=1/7{
-	putexcel B`row':C`row'="", merge
-	local row=`row'+2
-}
- 
-putexcel D3:I3, hcenter
-
-//Graphing out balance table
-label define trial_assignmentlbl 0 Control 1 Treatment, modify
-
-label values trial_assignment trial_assignmentlbl
-
-forest logit (ce_1 ce_2 ce_3 ce_4 ce_5 ce_6 ce_7) , t(trial_assignment) or
-
-graph save "Graph" "${directory}/outputs/BalanceTable_Graph.gph"
+keep if wave == 0
 
 
+iebaltab ///
+	cp_17_* cp_18 cp_19 cp_20 cp_21 ///
+	g_* cp_14d_mm checklist_essential_pct ///
+	correct* cb* dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	med_l_any_3 med_k_any_9 ///
+		, grpvar(trial_assignment) control(1) covariates(i.case) vce(cluster qutub_id) ///
+				replace rowvarlabel ///
+					save("${directory}/outputs/balance_table.xlsx") 
+			
+				
+putexcel set "${directory}/outputs/balance_table.xlsx", modify
 
-//iebaltab i.ce_1  if wave==0, grpvar(trial_assignment) save("${directory}/outputs/balance_tables_2.xlsx") rowvarlabels
+putexcel A4:F17 , fpattern(solid, "204 255 255 ") border(all)
+putexcel A18:F43 , fpattern(solid, " 204 255 204") border (all)
+putexcel A44:F79 , fpattern(solid, "255 255 153  ") border (all)
+
+putexcel H4, fpattern(solid, "204 255 255 ") border(all)
+putexcel H5, fpattern(solid, "204 255 204 ") border(all)
+putexcel H6, fpattern(solid, "255 255 153 ") border(all)
+
+putexcel I4:J4="Balance variable", merge 
+putexcel I5:J5="Process Indicator", merge 
+putexcel I6:J6="Quality Outcome", merge 
+
+/// Graph of balance tables
+
+/// Clustering of errors??
+
+forest reg ///
+	(cp_17_* cp_18 cp_19 cp_20 cp_21) ///
+	, t(trial_assignment)  controls(i.case) ///
+	  vce(cluster qutub_id) ///
+	  graphopts(title("Balance Variable") ///
+	  xtitle("{&larr} Favors Control      Favors Treatment {&rarr}"))
+
+graph export "${directory}/outputs/balance_variables.eps", replace
+
+forest reg ///
+	(g_* cp_14d_mm checklist_essential_pct) ///
+	, t(trial_assignment) bh controls(i.case) graphopts(title("Process Indicators") ///
+		xtitle(" {&larr}Favors Control          Favors Treatment {&rarr}"))
+
+graph export "${directory}/outputs/Process_Indicators.eps", replace
+
+forest reg ///
+	(correct* cb* dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	med_l_any_3 med_k_any_9) ///
+	, t(trial_assignment) bh controls(i.case) graphopts(title("Quality Outcomes") ///
+		xtitle("{&larr}Favors Control      Favors Treatment {&rarr}"))
+
+graph export "${directory}/outputs/Quality_Outcomes.eps", replace
+
+
+---
+
+
+
+
+
+
+
+			
 
 
 
