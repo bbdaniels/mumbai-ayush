@@ -6,6 +6,11 @@ global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 
 // Globals -------------------------------------------------------------------------------------
 
+//Install Packages
+net install "http://www.stata.com/users/kcrow/tab2xl", replace
+ssc install tabcount
+ssc install ietoolkit
+ssc install forest
 
  
   // title

@@ -1,13 +1,3 @@
-/// Install Packages 
-net install http://www.stata.com/users/kcrow/tab2xl, replace
-
-ssc install tabcount
-
-ssc install ietoolkit
-
-ssc install betterbar
-
-ssc install forest
 
 ///Load data
 
@@ -15,8 +5,8 @@ use "${directory}/constructed/sp_both.dta", clear
 
 // Tabulating SP cases in qutub_sample_updated in wave 0 and 1
 
-local row = 6
-local row2 = 4
+	local row = 6 /// Starting row to export a table in row 6 in excel
+	local row2 = 4 /// Starting row2 to give headings to tables exported 
 
 putexcel set "${directory}/outputs/sp_case_tabs.xlsx", replace
 
