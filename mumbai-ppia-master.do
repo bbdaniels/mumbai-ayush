@@ -1,10 +1,11 @@
 // Master file for Mumbai Public Sector analysis
 
 // Set global directory locations
-global rawdata "/Users/RuchikaBhatia/Box Sync/Ruchika PPIA"
-global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
+global rawdata "/Users/bbdaniels/Box/Papers/Ruchika PPIA"
+global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
 
 // Install packages ------------------------------------------------------------------------------
+sysdir set PLUS "${directory}/ado/"
 
   net install "http://www.stata.com/users/kcrow/tab2xl", replace
   ssc install tabcount , replace
@@ -46,7 +47,7 @@ global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 // Part 1: Load datafiles into Git location ----------------------------------------------------
 
   // Hashdata command to import data from remote repository
-  qui run "${rawdata}/ado/iecodebook.ado"
+  qui run "${directory}/ado/iecodebook.ado"
 
   iecodebook export "${rawdata}/data/sp-wave-0.dta" ///
      using "${directory}/data/sp-wave-0.dta" ///

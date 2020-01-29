@@ -19,7 +19,7 @@ replace re_1 = 1 if re_1 > 1
 
 // Append --------------------------------------------------------------------------------------
 	use "${directory}/data/sp-wave-0.dta"
-  
+
 
 	qui append using ///
 	"${directory}/data/sp-wave-1.dta" ///
@@ -54,8 +54,8 @@ replace re_1 = 1 if re_1 > 1
   forvalues i = 0/2 {
     replace engaged = 1 if wave == `i' & ppia_facility_`i' == 1
   }
-  
-	clonevar qutub_sample_updated=qutub_sample // Creating sample types PPIA Control and Treatment 
+
+	clonevar qutub_sample_updated=qutub_sample // Creating sample types PPIA Control and Treatment
 		recode qutub_sample_updated (7 = 10) if trial_assignment == 0
 		lab def qutub_sample 10 "Control" , modify
 		recode qutub_sample_updated 7 = 11 if trial_assignment == 1
@@ -65,7 +65,7 @@ replace re_1 = 1 if re_1 > 1
 	replace med_any = 0 if med == 0 //Creating indicator for any medicine prescribed
 	replace med_any = 1 if (med!=0 & med<.)
 
-	gen polypharmacy = . //Creating indicator for mutiple medicines prescribed 
+	gen polypharmacy = . //Creating indicator for mutiple medicines prescribed
 	replace polypharmacy = 0 if (med == 0 | med == 1)
 	replace polypharmacy = 1 if (med > 1  & med < .)
 	label variable polypharmacy polypharmacy
@@ -81,7 +81,7 @@ replace re_1 = 1 if re_1 > 1
 	replace cp_17_b = 0 if (cp_17 == 1 | cp_17 == 3)
 	label variable cp_17_b "Provider age 30-50"
 
-	gen cp_17_c = . // Creating indicator for provider age>50 
+	gen cp_17_c = . // Creating indicator for provider age>50
 	replace cp_17_c = 1 if cp_17 == 3
 	replace cp_17_c = 0 if (cp_17 == 1 | cp_17 == 2)
 	label variable cp_17_c "Provider age >50"
@@ -90,7 +90,7 @@ replace re_1 = 1 if re_1 > 1
 
 
 
-  
+
 
 // Save -------------------------------------------------------------------------------
 	save "${directory}/constructed/sp_both.dta" , replace
@@ -100,7 +100,7 @@ replace re_1 = 1 if re_1 > 1
 iecodebook export ///
   using "${directory}/constructed/sp-ayush.dta" ///
   , copy hash reset replace text
-   
+
 
 // End of dofile
 
