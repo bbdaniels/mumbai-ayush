@@ -169,7 +169,7 @@ use "${directory}/constructed/sp_both.dta", clear
 	unab Quality : correct* cb* dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
-	foreach i in Balance Process Quality{ // Creating balance table graphs for the 3 kinds of variables
+	foreach i in Balance Process Quality { // Creating balance table graphs for the 3 kinds of variables
 		forest reg ///
 		(``i' ') ///
 			, t(trial_assignment)  controls(i.case) ///
@@ -183,9 +183,10 @@ use "${directory}/constructed/sp_both.dta", clear
 	graph combine /// Combinig the above 3 graphs
 			"${directory}/outputs/balance.gph" ///
 			"${directory}/outputs/process.gph" ///
-			"${directory}/outputs/quality.gph", rows(3) altshrink xcommon
+			"${directory}/outputs/quality.gph" ///
+  , rows(3) altshrink xcommon ysize(7)
 
 
-	graph export "${directory}/outputs/balance_table_graph.eps" , replace xsize(4) // Exporting the combined graph
+	graph export "${directory}/outputs/balance_table_graph.eps" , replace // Exporting the combined graph
 
 // Have a great day!
