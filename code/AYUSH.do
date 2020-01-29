@@ -5,8 +5,8 @@ use "${directory}/constructed/sp_both.dta", clear
 
 // Tabulating SP cases in qutub_sample_updated in wave 0 and 1
 
-	local row = 6 /// Starting row to export a table in row 6 in excel
-	local row2 = 4 /// Starting row2 to give headings to tables exported 
+	local row = 6  // Starting row to export a table in row 6 in excel
+	local row2 = 4 // Starting row2 to give headings to tables exported 
 
 putexcel set "${directory}/outputs/sp_case_tabs.xlsx", replace
 
