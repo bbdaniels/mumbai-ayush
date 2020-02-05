@@ -88,9 +88,10 @@ forvalues i = 1/`nStrings' {
 
     // Replace any self-referenced controls here
     local theseControls = subinstr("`controls'","@","`1'",.)
+    local thisTreatment = subinstr("`treatment'","@","`1'",.)
 
 		// Regression
-		`cmd' `1' `treatment' ///
+		`cmd' `1' `thisTreatment' ///
       `theseControls' ///
       [`weight'`exp'] ///
       , `options' `or' `thisBonferroni'
