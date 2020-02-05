@@ -52,6 +52,7 @@
 # Stata
 !/**/*.do
 !/**/*.ado
+!/**/*.sthlp
 !/**/*.dtasig
 
 # R
