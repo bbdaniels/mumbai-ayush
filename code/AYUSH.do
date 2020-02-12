@@ -193,7 +193,7 @@ use "${directory}/constructed/sp_both.dta", clear
  //	-------------------------
 	// Diff in Diff ITT and TOT 
 	
-	use "${directory}/constructed/sp_analysis.dta"
+	use "${directory}/constructed/sp_analysis.dta", clear 
 	
 	gen d_treat = 0 if trial_assignment == 0 // Creating dummy for trial_assignment
 	replace d_treat = 1 if trial_assignment == 1 
@@ -211,19 +211,26 @@ use "${directory}/constructed/sp_both.dta", clear
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9 
 	
+	ivregress 2sls dr_1  (d_totXpost d_tot  = d_treat d_treatXpost) d_post i.case, vce(cluster qutub_id) first 
 	
-	/* forest ivregress 2sls /// Diff in Diff TOT
+	forest ivregress 2sls /// Diff in Diff TOT
 	(`quality') ///
-		, t((d_treatXpost d_treat d_treatXpost = d_tot d_totXpost) controls(i.case)) ///
-		vce(cluster qutub_id) */
+		, t((d_totXpost d_tot  = d_treat d_treatXpost)) controls(i.case d_post) ///
+		vce(cluster qutub_id) bh graphopts(title("TOT")) sort(global)
+		
+		graph save "${directory}/outputs/TOT.gph", replace
 		
 		  
 	forest reg /// Diff in Diff ITT 
 	(`quality') ///
 		, t(d_treatXpost) controls(d_treat d_post i.case) ///
-		vce(cluster qutub_id) 
+		vce(cluster qutub_id) bh graphopts(title("ITT")) sort(global)
 		
 		graph save "${directory}/outputs/ITT.gph", replace
+		
+		graph combine ///
+			"${directory}/outputs/ITT.gph" ///
+			"${directory}/outputs/TOT.gph" 
 		
 	foreach i in `quality' { //IV 2SLS 
 		ivregress 2sls `i' i.case d_post (d_treatXpost d_treat d_treatXpost = d_tot d_totXpost), vce(cluster qutub_id)
@@ -237,12 +244,12 @@ use "${directory}/constructed/sp_both.dta", clear
 	egen unique_id = concat(qutub_id case wave) //Creating a unique id 
 	egen tag = tag(unique_id)
 	drop if tag == 0
-	drop unique_id tag 
+	drop unique_id tag med_l_any_1
 	
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
 				   med_l_any_3 med_k_any_9 
 	
-	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 /// Converting data to wide 
+	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 /// Converting data to wide 
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id case) j (wave)
 					
@@ -252,19 +259,29 @@ use "${directory}/constructed/sp_both.dta", clear
 	drop trial_assignment1 trial_treatment1 
 	
 	
-	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 polypharmacy1 med_l_any_11 med_l_any_21 ///
+	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 polypharmacy1 med_l_any_21 ///
 				   med_l_any_31 med_k_any_91
 				   
 	rename (`quality1') (`quality') //Renaming lagged variables to include in forest 
-	
-	foreach i in `quality' { //ANCOVA for ITT 
-		reg `i' trial_assignment i.case `i'0, vce(cluster qutub_id)
-		}
+
 		
-	/*forest reg /// Forest for ITT
-	(`quality1') ///
-		, t(trial_assignment) controls(i.case @0`quality1') ///
-		vce(cluster qutub_id) */
+	forest reg /// Forest for ITT
+	(`quality') ///
+		, t(trial_assignment) controls(i.case @0) ///
+		vce(cluster qutub_id) bh graphopts(title("ITT")) sort(global)
+		
+		graph save "${directory}/outputs/ITT.gph", replace
+		
+    forest ivregress 2sls /// Forest for TOT
+	(`quality') ///
+		, t((trial_treatment = trial_assignment)) controls(i.case @0) ///
+		vce(cluster qutub_id) bh graphopts(title("TOT")) sort(global)
+		
+		graph save "${directory}/outputs/TOT.gph", replace
+		
+		graph combine ///
+			"${directory}/outputs/ITT.gph" ///
+			"${directory}/outputs/TOT.gph" 
 		
 		 
 	foreach i in `quality' { // ANCOVA FOR TOT 
@@ -281,20 +298,27 @@ use "${directory}/constructed/sp_both.dta", clear
 	
 	keep if case == 7
 	
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab quality :  dr_1 dr_4 re_1 med_any polypharmacy  med_l_any_2 ///
 				   med_l_any_3 med_k_any_9 
 	
-	forest reg /// Outcomes for Case7 controlled for trial_assignment
+	forest reg /// Forest for ITT
 	(`quality') ///
 		, t(trial_assignment) ///
-		vce(cluster qutub_id) 
+		vce(cluster qutub_id) bh graphopts(title("ITT")) sort(global)
 		
-	graph save "${directory}/outputs/ITT_Case7.eps", replace
-	
-	/*forest ivregress 2sls /// Outcomes for Case7 IV trial_assignment 
-		(`quality')///
-		, t((trial_treatment trial_treatment= trial_assignment)) ///
-		vce(cluster qutub_id)
+		graph save "${directory}/outputs/ITT.gph", replace
+		
+    forest ivregress 2sls /// Forest for TOT
+	(`quality') ///
+		, t((trial_treatment = trial_assignment)) ///
+		vce(cluster qutub_id) bh graphopts(title("TOT")) sort(global)
+		
+		graph save "${directory}/outputs/TOT.gph", replace
+		
+		graph combine ///
+			"${directory}/outputs/ITT.gph" ///
+			"${directory}/outputs/TOT.gph" ///
+			, c(1) xcom
 	
 		
 	graph save "${directory}/outputs/TOT_Case7.eps", replace */
@@ -314,9 +338,7 @@ use "${directory}/constructed/sp_both.dta", clear
 	
 	preserve 
 	keep if case == 7 
-	foreach i in `quality' {
-	 rename `i' `i'_7
-	}
+
 	drop case 
 	save "${directory}/constructed/sp_case7.dta", replace 
 	restore
@@ -330,6 +352,13 @@ use "${directory}/constructed/sp_both.dta", clear
 	merge 1:1 qutub_id using "${directory}/constructed/sp_case7.dta"
 	
 	drop if _merge != 3
+	
+	forest reg /// Forest for ITT
+	(`quality') ///
+		, t(@_1) ///
+		vce(cluster qutub_id) bh graphopts(title("xxxx")) sort(global)
+		
+		
 	
 	foreach i in `quality' {
 		reg `i'_7 trial_assignment `i'_1, vce(cluster qutub_id)
@@ -366,11 +395,16 @@ use "${directory}/constructed/sp_both.dta", clear
 	restore 
 	
 	keep if case == 1 & wave == 1
-	foreach i in `quality' {
-	 rename `i' `i'_1
-	}
+	
 	
 	merge 1:1 qutub_id using "case1_0"
+	
+		forest reg /// Forest for ITT
+	(`quality') ///
+		, t(@_0) ///
+		vce(cluster qutub_id) bh graphopts(title("xxxx")) sort(global)
+		
+	
 	
 	foreach i in `quality' {
 		reg `i'_1 trial_assignment `i'_0, vce(cluster qutub_id)
@@ -384,13 +418,39 @@ use "${directory}/constructed/sp_both.dta", clear
 	
 	keep if qutub_sample_updated == 8 | qutub_sample_updated == 9 
 	
+	
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9 
 				   
-	gen d_PPIA = 0 if qutub_sample_updated == 8 
+	drop if case == 7 
+	
+	gen d_t = (wave == 0 & ppia_facility_0 == 1)  | (wave == 1 & ppia_facility_1 == 1)
+	
+	reg correct d_t wave i.case, vce(cluster qutub_id)
+	
+	forest reg ///
+	(`quality') ///
+		, t(d_t) controls(wave i.case i.qutub_sample_updated) ///
+		vce(cluster qutub_id) 
+	
+	forest reg ///
+	(`quality') ///
+		, t(d_t) controls(wave i.case) ///
+		vce(cluster qutub_id) 
+		
+		
+	
+	
+
+	
+	
+	gen d_PPIA = 0 if qutub_sample_updated == 8
 	replace d_PPIA = 1 if qutub_sample_updated == 9 
 	
-	gen d_PPIAXwave = d_PPIA * wave
+	gen d_time = 0 if  ppia_facility_0 ==0 | ppia_facility_1 == 0
+	gen d_time =1 if ppia_facility_0 ==1 | ppia_facility_1 == 1 
+	
+	gen d_PPIAXwave = d_PPIA * d_time
 	
 	drop if case == 7 
 	
@@ -398,12 +458,12 @@ use "${directory}/constructed/sp_both.dta", clear
 	(`quality') ///
 		, t(d_PPIA) controls(wave i.case) ///
 		vce(cluster qutub_id) 
-		graph save "${directory}/outputs/ITT_Non-Trial.gph", replace
+		graph export "${directory}/outputs/ITT_Non-Trial.eps", replace
 	
 	forest reg ///
 	(`quality') ///
 		, t(d_PPIAXwave) controls(d_PPIA wave i.case) ///
 		vce(cluster qutub_id) 
-		graph save "${directory}/outputs/DiffinDiff_Non-Trial.gph", replace
+		graph export "${directory}/outputs/DiffinDiff_Non-Trial.eps", replace
 	
 // Have a great day!
