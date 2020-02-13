@@ -82,6 +82,7 @@ svmat results , n(col)
 gen sig = pvalue < 0.05
 // graph bar sig, by(c11) over(c10)
 
+replace c10 = c10 * .5 // Convert to binary p.p. (sigma = 0.5)
 tostring c10, format(%3.2f) gen(eff) force
 graph bar sig , over(eff)
 -
