@@ -1,10 +1,24 @@
 // Simulate power of SP studies with mismatched cases
 
+// Get correlations for CXR for SP2-4
+
+use "${directory}/constructed/sp_both.dta" , clear
+
+  keep qutub_id case wave re_1
+  duplicates drop qutub_id case wave , force
+  reshape wide re_1 , i(qutub_id wave) j(case)
+
+  collapse (firstnm) re_12 re_13 re_14 , by(qutub_id)
+
+  corr re_12 re_13
+  corr re_13 re_14
+  corr re_12 re_14
+
 // Data generation program -----------------------------------------------------
 cap prog drop datagen
 prog def datagen
 
-  syntax anything /// anything = correlation of 1 and 2
+  syntax /// anything = correlation of 1 and 2
     , effect(string asis)
 
   clear
@@ -16,46 +30,49 @@ prog def datagen
   gen treatment = (_n <= 120) | (_n > 270)
 
     isid uid, sort
-    randtreat , gen(case0)
+    randtreat , gen(case0) multiple(3) unequal(1/4 1/4 2/4)
+      replace case0 = case0 + 2
 
     isid uid, sort
-    randtreat , gen(case1)
+    randtreat , gen(case1) multiple(3) unequal(1/4 1/4 2/4)
+      replace case1 = case1 + 2
 
   // Create overall fixed effects
   gen p_fe = rnormal()
 
     // Set correlation between C1 and C2
-    corr2data p_fe0 p_fe1 , cov(1 , `anything' \ `anything' , 1)
+    corr2data p_fe2 p_fe3 p_fe4 , cov(1 , 0.1126 , 0.2393 \ 0.1126 , 1 , -0.0922 \ 0.2393 , -0.0922 , 1)
 
   // SP structure
   reshape long case , i(uid) j(round)
     gen treated = treatment * round
+    expand 2 , gen(false)
+    replace case = 1 if false == 1
 
   // Outcomes
-  gen temp = round*runiform() + treatment*runiform() ///
-    + p_fe + (case * p_fe1) + ((1 - case) * p_fe0) ///
+  gen temp = round*runiform() + treatment*runiform() + p_fe ///
     + (case * runiform()) + rnormal()
+  forv i = 2/4 {
+    replace temp = temp + p_fe`i' if case == `i'
+  }
   egen outcome = std(temp)
   replace outcome = outcome + `effect'*treatment*round
 
   // Test
-  xtset uid round
   reg outcome treated round treatment i.case , cl(uid)
 
 end // -------------------------------------------------------------------------
 
 cap mat drop results
 foreach eff of numlist 0.1(.05).4 {
-  foreach corr of numlist 0(.1)1 {
-    forv iter = 1/100 {
-      qui datagen `corr' , effect(`eff')
-      mat a = r(table)
-      mat a = a[....,1]
-      mat a = a' , `corr' , `eff'
+  forv iter = 1/100 {
+    qui datagen , effect(`eff')
+    mat a = r(table)
+    mat a = a[....,1]
+    mat a = a' , `eff'
 
-      mat results = nullmat(results) ///
-        \ a
-    }
+    mat results = nullmat(results) ///
+      \ a
   }
 }
 
@@ -65,8 +82,9 @@ svmat results , n(col)
 gen sig = pvalue < 0.05
 // graph bar sig, by(c11) over(c10)
 
-tostring c11, format(%3.2f) gen(eff) force
-
+tostring c10, format(%3.2f) gen(eff) force
+graph bar sig , over(eff)
+-
 // Graph power
 qui levelsof eff , local(effs)
   local x = 1

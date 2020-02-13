@@ -11,7 +11,8 @@ sysdir set PLUS "${directory}/ado/"
   ssc install tabcount , replace
   ssc install ietoolkit , replace
   ssc install betterbar , replace
-  ssc install forest
+  ssc install randtreat , replace
+  cap ssc install forest
 
 // Globals -------------------------------------------------------------------------------------
 

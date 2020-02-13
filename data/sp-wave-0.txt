@@ -1,6 +1,6 @@
 
 Variable       Obs Unique       Mean        Min       Max  Label
------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------
 qutub_any_~l  1636      2   .2738386          0         1  Recieved NNL List from PATH
 qutub_apple    635      2   .2362205          0         1  Apple hub walk-in
 qutub_char~e   637      3          .          .         .  charitable_path
@@ -11,13 +11,13 @@ qutub_freegx    74      1          .          .         .  freegenexpert
 qutub_hub      635      2   .1464567          0         1  PPIA hub walk-in
 qutub_id      1636    730          .          .         .  ProviderID
 qutub_id_p~r  1636    728          .          .         .  
-qutub_larg~b   635      2   .0771654          0         1  Hub has more than three networked...
+qutub_larg~b   635      2   .0771654          0         1  Hub has more than three networked providers
 qutub_netp~0   637      2   .7174254          0         1  PPIA Provider
 qutub_netw~0  1636      2   .3361858          0         1  Networked for Wave 0
 qutub_nnl      637      2    .188383          0         1  Networked provider at other location
-qutub_nonn~d   635      2   .2503937          0         1  Provider seen is a non-networked ...
-qutub_prov~d   455    123          .          .         .  QUTUBID for provider seen from tr...
-qutub_pxh      635      2   .5307087          0         1  Networked provider at networked l...
+qutub_nonn~d   635      2   .2503937          0         1  Provider seen is a non-networked doctor
+qutub_prov~d   455    123          .          .         .  QUTUBID for provider seen from tracking and form data
+qutub_pxh      635      2   .5307087          0         1  Networked provider at networked location
 qutub_sample  1636      6   5.376528          1         9  Sample Type
 qutub_samp~1  1635      2   .0917431          0         1  Non-PPIA Facility Walk-In
 qutub_samp~2  1635      2   .0568807          0         1  PPIA Hub Walk-In
@@ -49,7 +49,7 @@ cp_5          1485      9   6.486195          2        11  Provider Qualificatio
 cp_5_ayush    1636      2   .5378973          0         1  AYUSH
 cp_5_mbbs     1636      2   .3288509          0         1  MBBS
 cp_5_other    1636      2   .1320293          0         1  Other Qualification
-cp_5_qual     1636      4   1.944988          0         3  RECODE of cp_5 (Provider Qualific...
+cp_5_qual     1636      4   1.944988          0         3  RECODE of cp_5 (Provider Qualification)
 cp_5_rmp      1636      2   .0012225          0         1  RMP
 cp_7          1636    728          .          .         .  Provider ID
 cp_9          1633      8   84.78751          3        89  Interviewer ID
@@ -87,33 +87,33 @@ cp_18         1628      3   .8304668          0         3  Provider Male
 cp_19         1636     31   2.149144          0        63  Patients Waiting on Arrival
 cp_20         1636     26   1.889364          0        48  Patients Waiting on Departure
 cp_21         1633      2   .6172688          0         1  Provider Has Compounder
-cp_22         1636      2   .4174817          0         1  Provider/Compounder took Personal...
-cp_23         1636      2   .1894866          0         1  Provider/Compounder took phone nu...
-cp_24         1633      2   .0881813          0         1  Provider filled out a PPIA regist...
+cp_22         1636      2   .4174817          0         1  Provider/Compounder took Personal Details
+cp_23         1636      2   .1894866          0         1  Provider/Compounder took phone number
+cp_24         1633      2   .0881813          0         1  Provider filled out a PPIA registration form
 cp_24_a          6      2   1.833333          1         2  PPIA case registration ID
 cp_25         1635      3   1.257492          1         4  Language spoken to provider
 dr_1          1636      2   .4517115          0         1  TB Suspicion
-dr_1a         1631      2   .0239117          0         1  Provider said it was necessary to...
+dr_1a         1631      2   .0239117          0         1  Provider said it was necessary to ascertain DR TB
 dr_2          1636      2   .6515892          0         1  Prescription
 dr_2a         1109      2   .7601443          0         1  Medicine Prescription
 dr_2b         1105      2   .6895928          0         1  Diagnostic Test Prescription
 dr_3          1636      3   .1986553          0         3  Any Diagnosis
 dr_3a          323     31          .          .         .  Diagnosis
 dr_4          1636      2   .0831296          0         1  Referral for Further Management
-dr_4a          139      4   1.705036          1         4  Private Provider/Hospital or DOTS...
+dr_4a          139      4   1.705036          1         4  Private Provider/Hospital or DOTS or Other
 dr_4b_netw~k   136      2   .2132353          0         1  Networked Referral
 dr_4c_netw~k    44      2   .4090909          0         1  Networked Provider
-dr_5          1636      3   .0843521          0         3  Received Vouchers or Referral Cou...
-dr_5a          139      2    .294964          0         1  Voucher or referral coupon for tr...
+dr_5          1636      3   .0843521          0         3  Received Vouchers or Referral Coupons
+dr_5a          139      2    .294964          0         1  Voucher or referral coupon for treatment
 dr_5a_no        41     36          .          .         .  Treatment voucher no.
 dr_5b          139      2   .7625899          0         1  Voucher or referral coupon for CXR
 dr_5b_no       105     95          .          .         .  CXR voucher no.
-dr_5c          139      2   .4676259          0         1  Voucher or referral coupon for Ge...
+dr_5c          139      2   .4676259          0         1  Voucher or referral coupon for GeneXpert
 dr_5c_no        64     36   6387.453        -99     64224  GeneXpert voucher no.
 ed_1          1632      3    .002451          0         3  Errors in presentation
 ed_1_text        3      2          .          .         .  Errors in presentation
 evening       1636      2   .4425428          0         1  Interaction Timing
-false         1636      1          0          0         0  False Observation for NNL/PxH dur...
+false         1636      1          0          0         0  False Observation for NNL/PxH during walkins
 form          1636   1636          .          .         .  Paper Form Number
 g_1           1636      2   .1118582          0         1  Used Cell Phone
 g_2           1636      2   .1124694          0         1  Other People in Room
@@ -285,7 +285,7 @@ med_k_any_9   1636      2   .0409535          0         1  Steroids
 med_k_any_10  1636      2   .1075795          0         1  Anti-allergy medicines
 med_k_any_11  1636      2   .0006112          0         1  Cardiac medication
 med_k_any_12  1636      2   .0012225          0         1  Psychiatric/ neural medicines
-med_k_any_13  1636      2   .1216381          0         1  Identified as anther type of medi...
+med_k_any_13  1636      2   .1216381          0         1  Identified as anther type of medication
 med_k_any_14  1636      1          0          0         0  Household remedies
 med_k_any_15  1636      2   .0220049          0         1  NSAIDS
 med_k_any_16  1636      2   .2903423          0         1  Cough Syrups
@@ -417,8 +417,8 @@ sp1_h_7        804      2    .829602          0         1  Fever
 sp1_h_7_gi~n   140      1          0          0         0  Fever
 sp1_h_8        804      2   .5995025          0         1  Fever Type
 sp1_h_8_gi~n   324      1          0          0         0  Fever Type
-sp1_h_9        804      2   .1330846          0         1  Family or Family with Similar Sym...
-sp1_h_9_gi~n   697      1          0          0         0  Family or Family with Similar Sym...
+sp1_h_9        804      2   .1330846          0         1  Family or Family with Similar Symptoms
+sp1_h_9_gi~n   697      1          0          0         0  Family or Family with Similar Symptoms
 sp1_h_10       804      2   .2549751          0         1  Chest Pain
 sp1_h_10_g~n   599      1          0          0         0  Chest Pain
 sp1_h_11       804      2    .318408          0         1  Loss of Appetite
@@ -476,8 +476,8 @@ sp2_h_13       247      2   .0080972          0         1  Previous Typhoid Diag
 sp2_h_13_g~n   244      1          0          0         0  Previous Typhoid Diagnosis
 sp2_h_14       247      2   .4251012          0         1  Past TB
 sp2_h_14_g~n   141      1          0          0         0  Past TB
-sp2_h_15       247      2   .2186235          0         1  Family or Family with Similar Sym...
-sp2_h_15_g~n   192      1          0          0         0  Family or Family with Similar Sym...
+sp2_h_15       247      2   .2186235          0         1  Family or Family with Similar Symptoms
+sp2_h_15_g~n   192      1          0          0         0  Family or Family with Similar Symptoms
 sp2_h_16       247      2   .1012146          0         1  Chest Pain
 sp2_h_16_g~n   221      1          0          0         0  Chest Pain
 sp2_h_17       247      2     .51417          0         1  Loss of Appetite
@@ -525,8 +525,8 @@ sp3_h_8        204      2   .6372549          0         1  Fever Type
 sp3_h_8_gi~n    74      2   .0135135          0         1  Fever Type
 sp3_h_9        204      2   .2401961          0         1  Family TB
 sp3_h_9_gi~n   155      1          0          0         0  Family TB
-sp3_h_10       204      2   .1421569          0         1  Family or Family with Similar Sym...
-sp3_h_10_g~n   175      1          0          0         0  Family or Family with Similar Sym...
+sp3_h_10       204      2   .1421569          0         1  Family or Family with Similar Symptoms
+sp3_h_10_g~n   175      1          0          0         0  Family or Family with Similar Symptoms
 sp3_h_11       204      2   .1617647          0         1  Chest Pain
 sp3_h_11_g~n   170      1          0          0         0  Chest Pain
 sp3_h_12       204      2   .4656863          0         1  Loss of Appetite
@@ -564,16 +564,16 @@ sp4_h_2        381      2   .8057743          0         1  Sputum
 sp4_h_2_gi~n    74      1          0          0         0  Sputum
 sp4_h_3        381      2    .160105          0         1  Saw Sputum Results
 sp4_h_3_gi~n   319      1          0          0         0  Saw Sputum Results
-sp4_h_4        381      2   .5958005          0         1  Medication Taken Last Month for P...
-sp4_h_4_gi~n   154      1          0          0         0  Medication Taken Last Month for P...
-sp4_h_5        381      2   .2230971          0         1  Visited Governmental Hospital for...
-sp4_h_5_gi~n   296      2   .0033784          0         1  Visited Governmental Hospital for...
+sp4_h_4        381      2   .5958005          0         1  Medication Taken Last Month for Present Illness
+sp4_h_4_gi~n   154      1          0          0         0  Medication Taken Last Month for Present Illness
+sp4_h_5        381      2   .2230971          0         1  Visited Governmental Hospital for Previous Illness
+sp4_h_5_gi~n   296      2   .0033784          0         1  Visited Governmental Hospital for Previous Illness
 sp4_h_6        380      2   .2078947          0         1  Treatment for Previous Illness
 sp4_h_6_gi~n   300      1          0          0         0  Treatment for Previous Illness
-sp4_h_7        381      2   .2703412          0         1  Sputum or X-Rays Done for Previou...
-sp4_h_7_gi~n   278      1          0          0         0  Sputum or X-Rays Done for Previou...
-sp4_h_8        381      2   .1653543          0         1  Diagnosis Given by Governmental H...
-sp4_h_8_gi~n   318      1          0          0         0  Diagnosis Given by Governmental H...
+sp4_h_7        381      2   .2703412          0         1  Sputum or X-Rays Done for Previous Illness
+sp4_h_7_gi~n   278      1          0          0         0  Sputum or X-Rays Done for Previous Illness
+sp4_h_8        381      2   .1653543          0         1  Diagnosis Given by Governmental Hospital
+sp4_h_8_gi~n   318      1          0          0         0  Diagnosis Given by Governmental Hospital
 sp4_h_9        381      2   .3569554          0         1  Past TB Treatment
 sp4_h_9_gi~n   245      1          0          0         0  Past TB Treatment
 sp4_h_10       381      2   .7007874          0         1  For How Long Past TB Treatment
@@ -668,4 +668,4 @@ trial_gx_d~e    50      9          .          .         .  GX Vouchers Date
 trial_notes    332    123          .          .         .  Notes
 trial_trea~t   579      2   .4853195          0         1  Joined PPIA Network
 trial_trea~e   243     32          .          .         .  Network Start Date
------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------
