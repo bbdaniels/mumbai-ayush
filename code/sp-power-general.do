@@ -82,7 +82,7 @@ qui levelsof eff , local(effs)
       ytit("Power") ylab(0 "0%" .2 "20%" .4 "40%" .6 "60%" .8 "80%" 1 "100%") ///
       yline(.8 , lc(black) lp(dash))
 
-  graph export "${directory}/outputs/power-simulations.eps" , replace
+  graph export "${directory}/outputs/sp-power-general.eps" , replace
 
 
 // End of power calculations

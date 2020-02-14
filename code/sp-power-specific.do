@@ -65,7 +65,7 @@ end // -------------------------------------------------------------------------
 
 cap mat drop results
 foreach eff of numlist 0.1(.05).4 {
-  forv iter = 1/100 {
+  forv iter = 1/500 {
     qui datagen , effect(`eff')
     mat a = r(table)
     mat a = a[....,1]
@@ -80,28 +80,15 @@ clear
 svmat results , n(col)
 
 gen sig = pvalue < 0.05
-// graph bar sig, by(c11) over(c10)
 
 replace c10 = c10 * .5 // Convert to binary p.p. (sigma = 0.5)
 tostring c10, format(%3.2f) gen(eff) force
-graph bar sig , over(eff)
--
-// Graph power
-qui levelsof eff , local(effs)
-  local x = 1
-  foreach eff in `effs' {
-    local graphs `"`graphs' (lpoly sig c10 if eff == "`eff'" , degree(1) lw(thick))"'
-    local legend `"`x' "`eff'" `legend' "'
-    local ++x
-  }
+  replace eff = subinstr(eff,"0.0","",.)
+  replace eff = subinstr(eff,"0.","",.)
+  replace eff = eff + "p.p."
 
-  tw `graphs' ///
-    , legend(on c(1) pos(3) title("Effect Size") order(`legend')) ///
-      xtit("Correlation between Case 1 and Case 2 performance") ///
-      ytit("Power") ylab(0 "0%" .2 "20%" .4 "40%" .6 "60%" .8 "80%" 1 "100%") ///
-      yline(.8 , lc(black) lp(dash))
+graph bar sig , over(eff) ytit("") xtit("Percentage-Point Change in Outcome") 
 
-  graph export "${directory}/outputs/power-simulations.eps" , replace
-
+graph export "${directory}/outputs/sp-power-specific.eps" , replace
 
 // End of power calculations
