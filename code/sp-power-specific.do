@@ -87,7 +87,7 @@ tostring c10, format(%3.2f) gen(eff) force
   replace eff = subinstr(eff,"0.","",.)
   replace eff = eff + "p.p."
 
-graph bar sig , over(eff) ytit("") xtit("Percentage-Point Change in Outcome") 
+graph bar sig , bar(1, fc(black)) over(eff , sort(sig)) ytit("") yline(0.8 , lc(gray) lp(dash))
 
 graph export "${directory}/outputs/sp-power-specific.eps" , replace
 
