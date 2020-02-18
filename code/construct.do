@@ -89,11 +89,23 @@ replace re_1 = 1 if re_1 > 1
 	label variable correct "Correct Management"
 
 
-
-
-
 // Save -------------------------------------------------------------------------------
 	save "${directory}/constructed/sp_both.dta" , replace
+	
+// Creating data for Diff in Diff and ANCOVA 
+
+	use "${directory}/constructed/sp_both.dta", clear 
+	
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+				   med_l_any_3 med_k_any_9 
+	
+	keep qutub_id qutub_sample_updated trial_treatment trial_assignment case wave `quality'
+	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
+	drop if case == 7 
+	
+	save "${directory}/constructed/sp_analysis.dta", replace 
+	
+
 
 ---
 

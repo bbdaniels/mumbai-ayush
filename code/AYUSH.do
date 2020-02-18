@@ -210,44 +210,139 @@ use "${directory}/constructed/sp_both.dta", clear
 	
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9 
+				   
+
+	//Table 2 
 	
-	ivregress 2sls dr_1  (d_totXpost d_tot  = d_treat d_treatXpost) d_post i.case, vce(cluster qutub_id) first 
+	 mat t2=J(12,22,0)
+	 
+	 foreach i in `quality' {
+		local lbl`i': variable label `i'
+	}	
+	
+	matrix rownames t2 = "`lblcorrect'" "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  "`lblre_3'" "`lblre_4'" ///
+						 "`lblmed_any'" "`lblpolypharmacy'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_k_any_9'"  
+	 
+	matrix colnames t2 = "SP1" "SP2" "SP3" "SP4" "SP1" "SP2" "SP3" "SP4" "SP1" "SP2" "SP3" "SP4" "SP1" "SP2" "SP3" "SP4" "Effect" "Std Error" "P-Value" "Effect" "Std Error" "P-Value" 
+						  
+	 local row = 0
+	 
+	 foreach i in `quality' {
+
+		local row = `row' + 1 
+		
+		quietly reg `i' d_treatXpost d_treat d_post i.case, vce(cluster qutub_id)
+		
+		mat t2[`row', 1] = _b[_cons]
+		mat t2[`row', 5] = _b[_cons] + _b[d_post]
+		mat t2[`row', 9] = _b[_cons] + _b[d_treat]
+		mat t2[`row', 13] = _b[_cons] + _b[d_treatXpost] + _b[d_treat] + _b[d_post]
+		
+		forvalues j = 2/4{
+			mat t2[`row', `j'] = _b[_cons] + _b[`j'.case]
+			mat t2[`row', `j' + 4] = _b[_cons] + _b[d_post] +  _b[`j'.case]
+			mat t2[`row', `j' + 8] = _b[_cons] + _b[d_treat] +  _b[`j'.case]
+			mat t2[`row', `j' +12] = _b[_cons] + _b[d_treatXpost] + _b[d_treat] + _b[d_post] +  _b[`j'.case]
+		}
+		
+		mat t2[`row', 17] = _b[d_treatXpost]
+		mat t2[`row', 18] = _se[d_treatXpost]
+		mat t2[`row', 19] = 2*ttail(e(df_r), abs(_b[d_treatXpost]/_se[d_treatXpost]))
+		
+		quietly ivregress 2sls `i'  (d_totXpost d_tot  = d_treat d_treatXpost) d_post i.case, vce(cluster qutub_id) 
+	
+		mat t2[`row', 20] = _b[d_totXpost]
+		mat t2[`row', 21] = _se[d_totXpost]
+		mat t2[`row', 22] =  2*normal(-abs(_b[d_totXpost]/_se[d_totXpost]))
+	 }
+	
+	forvalues i = 1/12{
+		forvalues j = 1/22{
+			matrix t2[`i', `j'] = round(t2[`i',`j'], 0.001)
+		}
+	}
+	
+	putexcel set "${directory}/outputs/Table_2.xlsx", replace 
+
+	putexcel D7=matrix(t2), names 
+	
+	putexcel F6:G6 = "Control (Wave-0)" ///
+		, merge hcenter font(calibri,13) bold underline 
+		
+	putexcel J6:K6 = "Control (Wave-1)" ///
+		, merge hcenter font(calibri,13) bold underline 
+		
+	putexcel N6:P6 = "Treatment (Wave-0)" ///
+		, merge hcenter font(calibri,13) bold underline 
+	
+	putexcel R6:T6 = "Treatment (Wave-1)" ///
+		, merge hcenter font(calibri,13) bold underline 
+			
+	putexcel V6 = "ITT" ///
+		,  hcenter font(calibri,13) bold underline 
+	
+	putexcel Y6 = "TOT" ///
+		,  hcenter font(calibri,13) bold underline 
+		
+	
+	
+	putexcel D7:D19, hcenter bold fpattern(solid, "192 192 192") border(right, medium)
+	putexcel D7:D19, border(left, medium)
+	putexcel H7:H19, border(right, medium)
+	putexcel L7:L19, border(right, medium)
+	putexcel P7:P19, border(right, medium)
+	putexcel D7:D19, border(right, medium)
+	putexcel T7:T19, border(right, medium)
+	putexcel W7:W19, border(right, medium)
+	putexcel Z7:Z19, border(right, medium)
+	putexcel D7:Z7, hcenter bold fpattern(solid, "192 192 192") border(top, medium)
+	putexcel D7:Z7, border(bottom, medium)
+	putexcel D19:Z19, border(bottom, medium)
+	
+	
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+				   med_l_any_3 med_k_any_9 
+				   
+	//set scheme uncluttered
+	
+	//set scheme plottig 
 	
 	forest ivregress 2sls /// Diff in Diff TOT
 	(`quality') ///
 		, t((d_totXpost d_tot  = d_treat d_treatXpost)) controls(i.case d_post) ///
-		vce(cluster qutub_id) bh graphopts(title("TOT")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("Diff in Diff : TOT")) sort(global)
 		
-		graph save "${directory}/outputs/TOT.gph", replace
+		graph save "${directory}/outputs/Diff_in_Diff_TOT.gph", replace
 		
-		  
+	
+
 	forest reg /// Diff in Diff ITT 
 	(`quality') ///
 		, t(d_treatXpost) controls(d_treat d_post i.case) ///
-		vce(cluster qutub_id) bh graphopts(title("ITT")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("Diff in Diff : ITT")) sort(global)
 		
-		graph save "${directory}/outputs/ITT.gph", replace
+		graph save "${directory}/outputs/Diff_in_Diff_ITT.gph", replace
 		
-		graph combine ///
-			"${directory}/outputs/ITT.gph" ///
-			"${directory}/outputs/TOT.gph" 
 		
-	foreach i in `quality' { //IV 2SLS 
-		ivregress 2sls `i' i.case d_post (d_treatXpost d_treat d_treatXpost = d_tot d_totXpost), vce(cluster qutub_id)
-	}
-	
-	
 	// ANCOVA ITT AND TOT
 	
 	use "${directory}/constructed/sp_analysis.dta", clear 
+	
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
+				   med_l_any_3 med_k_any_9 
+				   
+	local j = 1 
+	foreach i in `quality'{
+		local x`j' : variable label `i'
+		local j = `j' + 1 
+	}
+	
 	
 	egen unique_id = concat(qutub_id case wave) //Creating a unique id 
 	egen tag = tag(unique_id)
 	drop if tag == 0
 	drop unique_id tag med_l_any_1
-	
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 
 	
 	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 /// Converting data to wide 
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
@@ -263,30 +358,36 @@ use "${directory}/constructed/sp_both.dta", clear
 				   med_l_any_31 med_k_any_91
 				   
 	rename (`quality1') (`quality') //Renaming lagged variables to include in forest 
-
-		
+	
+	local j = 1 
+	foreach i in `quality' {
+		label variable `i' "`x`j''"
+		local j = `j' + 1
+	}
+	
 	forest reg /// Forest for ITT
 	(`quality') ///
 		, t(trial_assignment) controls(i.case @0) ///
-		vce(cluster qutub_id) bh graphopts(title("ITT")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("ANCOVA : ITT")) sort(global)
 		
-		graph save "${directory}/outputs/ITT.gph", replace
+		graph save "${directory}/outputs/ANCOVA_ITT.gph", replace
 		
     forest ivregress 2sls /// Forest for TOT
 	(`quality') ///
 		, t((trial_treatment = trial_assignment)) controls(i.case @0) ///
-		vce(cluster qutub_id) bh graphopts(title("TOT")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("ANCOVA : TOT")) sort(global)
 		
-		graph save "${directory}/outputs/TOT.gph", replace
+		graph save "${directory}/outputs/ANCOVA_TOT.gph", replace
 		
 		graph combine ///
-			"${directory}/outputs/ITT.gph" ///
-			"${directory}/outputs/TOT.gph" 
+			"${directory}/outputs/Diff_in_Diff_ITT.gph" ///
+			"${directory}/outputs/Diff_in_Diff_TOT.gph" ///
+			"${directory}/outputs/ANCOVA_ITT.gph" ///
+			"${directory}/outputs/ANCOVA_TOT.gph" , xcommon ysize(6) altshrink
+			
+		graph export "${directory}/outputs/DID_ANCOVA_Combine.eps", replace 
 		
-		 
-	foreach i in `quality' { // ANCOVA FOR TOT 
-		ivregress 2sls `i'  i.case `i'0 (trial_treatment = trial_assignment), vce(cluster qutub_id)
-		}
+-----
 		
 	/* Using forest*/
 
@@ -465,5 +566,11 @@ use "${directory}/constructed/sp_both.dta", clear
 		, t(d_PPIAXwave) controls(d_PPIA wave i.case) ///
 		vce(cluster qutub_id) 
 		graph export "${directory}/outputs/DiffinDiff_Non-Trial.eps", replace
+	
+	
+	
+	//Generating tables and graphs 
+	
+	
 	
 // Have a great day!
