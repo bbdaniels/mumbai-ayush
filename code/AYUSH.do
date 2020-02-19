@@ -300,6 +300,8 @@ use "${directory}/constructed/sp_both.dta", clear
 	putexcel D7:Z7, border(bottom, medium)
 	putexcel D19:Z19, border(bottom, medium)
 	
+	putexcel N3:P3 = "Difference in Difference", merge hcenter font(calibri,14) bold underline 
+	
 	
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9 
@@ -389,7 +391,6 @@ use "${directory}/constructed/sp_both.dta", clear
 		
 -----
 		
-	/* Using forest*/
 
 	//Outocomes for Case 7 
 	
@@ -399,30 +400,83 @@ use "${directory}/constructed/sp_both.dta", clear
 	
 	keep if case == 7
 	
-	unab quality :  dr_1 dr_4 re_1 med_any polypharmacy  med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 
+	unab quality :  dr_1 dr_4 re_1 med_any polypharmacy med_l_any_2 ///
+				    med_l_any_3 med_k_any_9 
+					
+	mat t4=J(8,6,0)
+	 
+	 foreach i in `quality' {
+		local lbl`i': variable label `i'
+	}	
+	
+	matrix rownames t4 =  "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  ///
+						 "`lblmed_any'" "`lblpolypharmacy'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_k_any_9'"  
+	 
+	matrix colnames t4 = "Effect" "Std Error" "P-Value" "Effect" "Std Error" "P-Value" 		
+	
+	local row = 1  
+	
+	foreach i in `quality' {
+		quietly reg `i' trial_assignment, vce(cluster qutub_id)
+		mat t4[`row', 1] = r(table)[1,1]
+		mat t4[`row', 2] = r(table)[2,1]
+		mat t4[`row', 3] = r(table)[4,1]
+		
+		quietly ivregress 2sls `i' (trial_treatment = trial_assignment), vce(cluster qutub_id)
+		mat t4[`row', 4] = r(table)[1,1]
+		mat t4[`row', 5] = r(table)[2,1]
+		mat t4[`row', 6] = r(table)[4,1]
+		
+		local row = `row' + 1
+
+	}
+	
+	forvalues i = 1/8{
+		forvalues j = 1/6{
+			matrix t4[`i', `j'] = round(t4[`i',`j'], 0.001)
+		}
+	}
+	
+	putexcel set "${directory}/outputs/Table_4.xlsx", replace 
+	
+	putexcel D5 = matrix(t4), names 
+	
+	putexcel F4 = "ITT ", hcenter bold underline 
+	putexcel I4 = "TOT", hcenter bold underline
+	putexcel D5:D13, hcenter bold fpattern(solid, "192 192 192") border(right, medium) 
+	putexcel D5:D13, border(left, medium)
+	putexcel D5:J5, hcenter bold fpattern(solid, "192 192 192") border(top, medium) 
+	putexcel D5:J5, border(bottom, medium)
+	putexcel J5:J13, border(right, medium)
+	putexcel D13:J13, border(bottom, medium)
+	putexcel G5:G13, border(right,medium)
+	
+
+	putexcel G2:H2 = "SP-7 Outcomes", merge hcenter bold underline font(calibri,14)
 	
 	forest reg /// Forest for ITT
 	(`quality') ///
 		, t(trial_assignment) ///
-		vce(cluster qutub_id) bh graphopts(title("ITT")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("ITT-SP7")) sort(global)
 		
-		graph save "${directory}/outputs/ITT.gph", replace
+		graph save "${directory}/outputs/ITT-SP7.gph", replace
+		
 		
     forest ivregress 2sls /// Forest for TOT
 	(`quality') ///
 		, t((trial_treatment = trial_assignment)) ///
-		vce(cluster qutub_id) bh graphopts(title("TOT")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("TOT-SP7")) sort(global)
 		
-		graph save "${directory}/outputs/TOT.gph", replace
+		graph save "${directory}/outputs/TOT-SP7.gph", replace
 		
 		graph combine ///
-			"${directory}/outputs/ITT.gph" ///
-			"${directory}/outputs/TOT.gph" ///
-			, c(1) xcom
+			"${directory}/outputs/ITT-SP7.gph" ///
+			"${directory}/outputs/TOT-SP7.gph" ///
+			, ysize(6) xcom altshrink c(1)
 	
 		
-	graph save "${directory}/outputs/TOT_Case7.eps", replace */
+	graph export "${directory}/outputs/TOT&ITT-Case7.eps", replace //////DOUBTTTTTTTT!
 	
 	
 	//Outocomes for Case 7 with Case 1 Outcomes as control
@@ -438,44 +492,76 @@ use "${directory}/constructed/sp_both.dta", clear
 	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11 
 	
 	preserve 
-	keep if case == 7 
-
-	drop case 
-	save "${directory}/constructed/sp_case7.dta", replace 
+		keep if case == 7 
+		drop case 
+		save "${directory}/constructed/sp_case7.dta", replace 
 	restore
 	
 	keep if case == 1 
 	foreach i in `quality' {
-	 rename `i' `i'_1
+		rename `i' `i'_1
 	}
+	
 	drop case 
 	
 	merge 1:1 qutub_id using "${directory}/constructed/sp_case7.dta"
 	
 	drop if _merge != 3
 	
-	forest reg /// Forest for ITT
-	(`quality') ///
-		, t(@_1) ///
-		vce(cluster qutub_id) bh graphopts(title("xxxx")) sort(global)
-		
-		
+  foreach i in `quality' {
+	reg `i' `i'_1, vce(cluster qutub_id)
+  }
+	
+	mat t5=J(12,3,0)
+	 
+	 foreach i in `quality' {
+		local lbl`i': variable label `i'
+	}	
+	
+	matrix rownames t5 = "`lblcorrect'" "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  "`lblre_3'" "`lblre_4'" ///
+						 "`lblmed_any'" "`lblpolypharmacy'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_k_any_9'"  
+	 
+	 
+	matrix colnames t5 = "Effect" "Std Error" "P-Value" 
+	local row = 1  
 	
 	foreach i in `quality' {
-		reg `i'_7 trial_assignment `i'_1, vce(cluster qutub_id)
+		quietly reg `i' `i'_1, vce(cluster qutub_id)
+		mat t5[`row', 1] = r(table)[1,1]
+		mat t5[`row', 2] = r(table)[2,1]
+		mat t5[`row', 3] = r(table)[4,1]
+		
+		local row = `row' + 1
+
 	}
 	
+	forvalues i = 1/12{
+		forvalues j = 1/3{
+			matrix t5[`i', `j'] = round(t5[`i',`j'], 0.001)
+		}
+	}
+	
+	putexcel set "${directory}/outputs/Table_5.xlsx", replace 
+	
+	putexcel D5 = matrix(t5), names 
+	
+	putexcel D5:D17, hcenter bold fpattern(solid, "192 192 192") border(right, medium) 
+	putexcel D5:D17, border(left, medium)
+	putexcel D5:G5, hcenter bold fpattern(solid, "192 192 192") border(top, medium) 
+	putexcel D5:G5, border(bottom, medium)
+	putexcel G5:G17, border(right, medium)
+	putexcel D17:G17, border(bottom, medium)
+	
+	putexcel C2:I2 = "SP-7 Outcomes with SP-1 Outcomes in Wave 1 as Control", merge bold underline font(calibri,14)
 	
 	
-	/*
-	rename _1 to 0? shuold work?
-	
-	forest reg ///
-	(`) ///
-		, t(trial_assignment) c(????) ///
-		vce(cluster qutub_id) 
+	forest reg /// Forest for ITT
+	(`quality') ///
+		, t(@_1) /// 
+		vce(cluster qutub_id) bh graphopts(title("SP7 with outcome of SP1 as a control")) sort(global) //DOUBTTTTTT Include trial_assignment as control???? 
 		
-		graph save "${directory}/outputs/ITT_Case7.eps", replace*/
+		graph export "${directory}/outputs/SP7 with SP1 as control.eps", replace
 	
 	
 	//Outocomes for Case 1 in wave 1 with Case 1 Outcomes in wave 0 as control
@@ -485,35 +571,71 @@ use "${directory}/constructed/sp_both.dta", clear
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9 
 
-	
+
 	preserve 
-	keep if case == 1 & wave == 0 
-	foreach i in `quality' {
-	 rename `i' `i'_0
-	}
-	save "case1_0.dta", replace
-	
+		keep if case == 1 & wave == 0 
+		foreach i in `quality' {
+			rename `i' `i'_0
+		}
+		save "${directory}/constructed/case1_0.dta", replace
 	restore 
 	
 	keep if case == 1 & wave == 1
 	
+	merge 1:1 qutub_id using "${directory}/constructed/case1_0.dta"
 	
-	merge 1:1 qutub_id using "case1_0"
+	mat t6=J(12,3,0)
+	 
+	 foreach i in `quality' {
+		local lbl`i': variable label `i'
+	}	
+	
+	matrix rownames t6 = "`lblcorrect'" "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  "`lblre_3'" "`lblre_4'" ///
+						 "`lblmed_any'" "`lblpolypharmacy'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_k_any_9'"  
+	 
+	 
+	matrix colnames t6 = "Effect" "Std Error" "P-Value" 
+	local row = 1  
+	
+	foreach i in `quality' {
+		quietly reg `i' `i'_0, vce(cluster qutub_id)
+		mat t6[`row', 1] = r(table)[1,1]
+		mat t6[`row', 2] = r(table)[2,1]
+		mat t6[`row', 3] = r(table)[4,1]
+		
+		local row = `row' + 1
+
+	}
+	
+	forvalues i = 1/12{
+		forvalues j = 1/3{
+			matrix t6[`i', `j'] = round(t6[`i',`j'], 0.001)
+		}
+	}
+	
+	putexcel set "${directory}/outputs/Table_6.xlsx", replace 
+	
+	putexcel D5 = matrix(t6), names 
+	
+	putexcel D5:D17, hcenter bold fpattern(solid, "192 192 192") border(right, medium) 
+	putexcel D5:D17, border(left, medium)
+	putexcel D5:G5, hcenter bold fpattern(solid, "192 192 192") border(top, medium) 
+	putexcel D5:G5, border(bottom, medium)
+	putexcel G5:G17, border(right, medium)
+	putexcel D17:G17, border(bottom, medium)
+	
+	putexcel C2:H2 = "SP-7 Outcomes with SP-1 Outcomes in Wave 0 as Control", merge bold underline font(calibri,13.5)
+	
 	
 		forest reg /// Forest for ITT
 	(`quality') ///
 		, t(@_0) ///
-		vce(cluster qutub_id) bh graphopts(title("xxxx")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("SP1 with Wave-0 SP1 as control")) sort(global)
 		
-	
-	
-	foreach i in `quality' {
-		reg `i'_1 trial_assignment `i'_0, vce(cluster qutub_id)
-	}
+	graph export "${directory}/outputs/SP1 with Wave-0 SP1 as control.eps", replace
 		
-	/* forest ?? */
-	
-	//Non-assigned 
+	//Diff in Diff on Non-Assigned Groups 
 	
 	use "${directory}/constructed/sp_both.dta", clear 
 	
@@ -527,49 +649,112 @@ use "${directory}/constructed/sp_both.dta", clear
 	
 	gen d_t = (wave == 0 & ppia_facility_0 == 1)  | (wave == 1 & ppia_facility_1 == 1)
 	
-	reg correct d_t wave i.case, vce(cluster qutub_id)
-	
 	forest reg ///
 	(`quality') ///
 		, t(d_t) controls(wave i.case i.qutub_sample_updated) ///
 		vce(cluster qutub_id) 
-	
-	forest reg ///
-	(`quality') ///
-		, t(d_t) controls(wave i.case) ///
-		vce(cluster qutub_id) 
-		
-		
-	
-	
 
+		graph export "${directory}/outputs/Non-Trial_DiffinDiff.eps", replace 
+		
+	mat t3=J(12,3,0)
+	local row = 1
+	
+	foreach i in `quality'{
+		reg `i' d_t wave i.case i.qutub_sample_updated
+		
+		mat t3[`row', 1] = r(table)[1,1]
+		mat t3[`row', 2] = r(table)[2,1]
+		mat t3[`row', 3] = r(table)[4,1]
+		
+		local row =`row' + 1
+	
+	}
+	
+	 foreach i in `quality' {
+		local lbl`i': variable label `i'
+	}	
+	
+	matrix rownames t3 = "`lblcorrect'" "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  "`lblre_3'" "`lblre_4'" ///
+						 "`lblmed_any'" "`lblpolypharmacy'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_k_any_9'"  
+						 
+	matrix colnames t3 = "Effect" "Std Error" "P-value"
+	
+		
+	forvalues i = 1/12{
+		forvalues j = 1/3{
+			matrix t3[`i', `j'] = round(t3[`i',`j'], 0.001)
+		}
+	}
 	
 	
-	gen d_PPIA = 0 if qutub_sample_updated == 8
-	replace d_PPIA = 1 if qutub_sample_updated == 9 
+	putexcel set "${directory}/outputs/Table_3.xlsx", replace 
+
+	putexcel D7 = matrix(t3), names 
+	putexcel D7:D19, hcenter bold fpattern(solid, "192 192 192") border(right, medium) 
+	putexcel D7:D19, border(left, medium)
+	putexcel D7:G7, hcenter bold fpattern(solid, "192 192 192") border(top, medium) 
+	putexcel D7:G7, border(bottom, medium)
+	putexcel G7:G19, border(right, medium)
+	putexcel D19:G19, border(bottom, medium)
 	
-	gen d_time = 0 if  ppia_facility_0 ==0 | ppia_facility_1 == 0
-	gen d_time =1 if ppia_facility_0 ==1 | ppia_facility_1 == 1 
-	
-	gen d_PPIAXwave = d_PPIA * d_time
-	
-	drop if case == 7 
-	
-	forest reg ///
-	(`quality') ///
-		, t(d_PPIA) controls(wave i.case) ///
-		vce(cluster qutub_id) 
-		graph export "${directory}/outputs/ITT_Non-Trial.eps", replace
-	
-	forest reg ///
-	(`quality') ///
-		, t(d_PPIAXwave) controls(d_PPIA wave i.case) ///
-		vce(cluster qutub_id) 
-		graph export "${directory}/outputs/DiffinDiff_Non-Trial.eps", replace
+--- 
+	// Graph Dot
 	
 	
+	use "${directory}/constructed/sp_both.dta", clear 
 	
-	//Generating tables and graphs 
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
+				   med_l_any_3 med_k_any_9 
+	
+	keep qutub_id qutub_sample_updated trial_treatment trial_assignment case wave `quality'
+	
+	egen unique_id = concat(qutub_id case wave) //Creating a unique id 
+	egen tag = tag(unique_id)
+	drop if tag == 0
+	drop unique_id 
+	
+	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 /// Converting data to wide 
+				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
+					, i(qutub_id case) j (wave)
+					
+	keep if case == 1| case == 7 
+	
+	bysort qutub_id : gen v1 = _N
+	drop if v1 == 1 //Keeping only those ids that have case 1(in either of the waves) and case 7 
+	drop v1 
+	
+	gen v1 = 0
+	replace v1 = 1 if case == 1 & correct0 != .
+	bysort qutub_id : egen in_wave_0 = sum(v1)
+	
+	gen v2 = 0
+	replace v2 = 1 if case == 1 & correct1 != .
+	bysort qutub_id : egen in_wave_1 = sum(v2)
+	
+	drop if case != 7 
+	drop v1 v2 
+	
+	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 polypharmacy1 med_l_any_21 ///
+				   med_l_any_31 med_k_any_91
+				   
+	rename (`quality1') (`quality') 
+	
+	foreach i in `quality' {
+		clonevar `i'_0 = `i'
+		clonevar `i'_1 = `i'
+	}
+	
+	foreach i in `quality' {
+		replace `i'_0 = . if in_wave_0 == 0 
+		replace `i'_1 = . if in_wave_1 == 0 
+	}
+	
+	
+	drop `quality' correct0 dr_10 dr_40 re_10 re_30 re_40 med_any0 polypharmacy0 med_l_any_20 ///
+				   med_l_any_30 med_k_any_90 
+	
+	graph dot dr_1_0 dr_1_1 
 	
 	
 	
