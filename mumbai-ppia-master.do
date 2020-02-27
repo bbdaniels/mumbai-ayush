@@ -1,8 +1,8 @@
 // Master file for Mumbai Public Sector analysis
 
 // Set global directory locations
-global rawdata "/Users/bbdaniels/Box/Papers/Ruchika PPIA"
-global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
+global rawdata "/Users/bbdaniels/Box/_Papers/Ruchika PPIA"
+global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
 
 // Install packages ------------------------------------------------------------------------------
 sysdir set PLUS "${directory}/ado/"
@@ -11,7 +11,7 @@ sysdir set PLUS "${directory}/ado/"
   ssc install tabcount , replace
   ssc install ietoolkit , replace
   ssc install betterbar , replace
-  ssc install forest
+  cap ssc install forest
 
 // Globals -------------------------------------------------------------------------------------
 
@@ -64,6 +64,11 @@ sysdir set PLUS "${directory}/ado/"
 
 // Part 3: Analysis ----------------------------------------------------------------------------
 
-*  do "${directory}/code/analysis.do"
+  run "${directory}/code/Fig_3.do"
+  run "${directory}/code/Fig_4.do"
+  run "${directory}/code/Table_2.do"
+  run "${directory}/code/Table_3.do"
+  run "${directory}/code/Table_4.do"
+
 
 // Have a lovely day!

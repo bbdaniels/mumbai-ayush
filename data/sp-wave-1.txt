@@ -1,6 +1,6 @@
 
 Variable       Obs Unique       Mean        Min       Max  Label
------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------
 qutub_id      2231    687          .          .         .  Facility ID
 qutub_id_p~r  2231    692          .          .         .  Provider ID
 qutub_sample  2231      6   5.562976          1         9  Sample Type
@@ -32,7 +32,7 @@ cp_5          2133     13   6.432255        -11        88  Provider Qualificatio
 cp_5_ayush    2231      2   .5965935          0         1  AYUSH
 cp_5_mbbs     2231      2   .3142089          0         1  MBBS
 cp_5_other    2231      2   .0891977          0         1  Other Qualification
-cp_5_qual     2231      3   2.103989          0         3  RECODE of cp_5 (Provider Qualific...
+cp_5_qual     2231      3   2.103989          0         3  RECODE of cp_5 (Provider Qualification)
 cp_5_rmp      2231      1          0          0         0  RMP
 cp_7          2231    847          .          .         .  Provider ID
 cp_9          2227     14   85.05568          2        97  Interviewer ID
@@ -68,18 +68,18 @@ cp_18         2230      3   .8340807          0         4  Provider Male
 cp_19         2231     37   2.367996          0        58  Patients Waiting on Arrival
 cp_20         2231     28   2.138055          0        40  Patients Waiting on Departure
 cp_21         2224      2   .0476619          0         1  Provider Has CFR
-cp_22         2231      2   .5154639          0         1  Provider/Compounder took Personal...
-cp_23         2230      2   .2242152          0         1  Provider/Compounder took phone nu...
+cp_22         2231      2   .5154639          0         1  Provider/Compounder took Personal Details
+cp_23         2230      2   .2242152          0         1  Provider/Compounder took phone number
 cp_24         2231      3   1.272972          1         4  Language
 dr_1          2231      2   .2536979          0         1  TB Suspicion
-dr_1a         2230      2   .0183857          0         1  Provider said it was necessary to...
+dr_1a         2230      2   .0183857          0         1  Provider said it was necessary to ascertain DR TB
 dr_2          2222      2   .6210621          0         1  Prescription
 dr_2a         1394      3   .8012912          0         3  Medicine Prescription
 dr_2b         1395      3   .6824373          0         3  Diagnostic Test Prescription
 dr_3          2221      2   .1823503          0         1  Any Diagnosis
 dr_3a            1      1          0          0         0  Diagnosis
 dr_4          2224      3    .068795          0         3  Referred
-dr_4a          145      5   1.565517          1         8  Private Provider/Hospital or DOTS...
+dr_4a          145      5   1.565517          1         8  Private Provider/Hospital or DOTS or Other
 dr_4d           60     30   208653.7    -600217    330110  PPIA provider
 dr_5          2221      2   .0684376          0         1  PPIA Registration Form
 dr_5_no        149    131          .          .         .  PPIA Registration Number
@@ -256,7 +256,7 @@ med_k_11         4      3         13          7        16  Med 11 Code
 med_k_12         1      1          4          4         4  Med 12 Code
 med_k_any_1   2231      2    .552667          0         1  Unlabelled Medicine
 med_k_any_2   2231      2   .0013447          0         1  Med Code: Any Unlabelled injections
-med_k_any_3   2231      2   .0022411          0         1  Med Code: Any IV bottles/glucose ...
+med_k_any_3   2231      2   .0022411          0         1  Med Code: Any IV bottles/glucose drip
 med_k_any_4   2231      2   .0255491          0         1  Med Code: Any Ayurvedic medicines
 med_k_any_5   2231      2   .0242044          0         1  Med Code: Any Homeopathic medicines
 med_k_any_6   2231      2   .4150605          0         1  Antibiotics
@@ -265,8 +265,8 @@ med_k_any_8   2231      2   .1694307          0         1  Med Code: Any Anti-ul
 med_k_any_9   2231      2   .1255043          0         1  Steroids
 med_k_any_10  2231      2   .1918422          0         1  Med Code: Any Anti-allergy medicines
 med_k_any_11  2231      2   .0040341          0         1  Med Code: Any Cardiac medication
-med_k_any_12  2231      2   .0228597          0         1  Med Code: Any Psychiatric/ neural...
-med_k_any_13  2231      2   .1156432          0         1  Med Code: Any Identified as anthe...
+med_k_any_12  2231      2   .0228597          0         1  Med Code: Any Psychiatric/ neural medicines
+med_k_any_13  2231      2   .1156432          0         1  Med Code: Any Identified as anther type of medication
 med_k_any_14  2231      1          0          0         0  Med Code: Any Household remedies
 med_k_any_15  2231      2   .0017929          0         1  Med Code: Any NSAIDS
 med_k_any_16  2231      2   .2720753          0         1  Med Code: Any Cough Syrups
@@ -383,8 +383,8 @@ sp1_h_7        748      2   .7687166          0         1  Fever
 sp1_h_7_gi~n   176      2   .0056818          0         1  Fever
 sp1_h_8        748      2   .5187166          0         1  Fever Type
 sp1_h_8_gi~n   358      1          0          0         0  Fever Type
-sp1_h_9        748      2   .0534759          0         1  Family or Family with Similar Sym...
-sp1_h_9_gi~n   707      1          0          0         0  Family or Family with Similar Sym...
+sp1_h_9        748      2   .0534759          0         1  Family or Family with Similar Symptoms
+sp1_h_9_gi~n   707      1          0          0         0  Family or Family with Similar Symptoms
 sp1_h_10       748      2    .144385          0         1  Chest Pain
 sp1_h_10_g~n   641      2   .0015601          0         1  Chest Pain
 sp1_h_11       748      2   .2660428          0         1  Loss of Appetite
@@ -442,8 +442,8 @@ sp2_h_13       252      2   .0357143          0         1  Previous Typhoid Diag
 sp2_h_13_g~n   243      1          0          0         0  Previous Typhoid Diagnosis
 sp2_h_14       252      2   .4484127          0         1  Past TB
 sp2_h_14_g~n   139      1          0          0         0  Past TB
-sp2_h_15       251      2   .0996016          0         1  Family or Family with Similar Sym...
-sp2_h_15_g~n   227      2   .0044053          0         1  Family or Family with Similar Sym...
+sp2_h_15       251      2   .0996016          0         1  Family or Family with Similar Symptoms
+sp2_h_15_g~n   227      2   .0044053          0         1  Family or Family with Similar Symptoms
 sp2_h_16       252      2   .1587302          0         1  Chest Pain
 sp2_h_16_g~n   211      1          0          0         0  Chest Pain
 sp2_h_17       252      2   .5198413          0         1  Loss of Appetite
@@ -489,8 +489,8 @@ sp3_h_8        211      2   .4075829          0         1  Fever Type
 sp3_h_8_gi~n   124      1          0          0         0  Fever Type
 sp3_h_9        211      2   .2037915          0         1  Family TB
 sp3_h_9_gi~n   168      1          0          0         0  Family TB
-sp3_h_10       211      2   .0663507          0         1  Family or Family with Similar Sym...
-sp3_h_10_g~n   197      1          0          0         0  Family or Family with Similar Sym...
+sp3_h_10       211      2   .0663507          0         1  Family or Family with Similar Symptoms
+sp3_h_10_g~n   197      1          0          0         0  Family or Family with Similar Symptoms
 sp3_h_11       211      2   .1184834          0         1  Chest Pain
 sp3_h_11_g~n   186      1          0          0         0  Chest Pain
 sp3_h_12       211      2   .3696682          0         1  Loss of Appetite
@@ -528,16 +528,16 @@ sp4_h_2        374      2   .7352941          0         1  Sputum
 sp4_h_2_gi~n    99      1          0          0         0  Sputum
 sp4_h_3        373      2   .0911528          0         1  Saw Sputum Results
 sp4_h_3_gi~n   339      1          0          0         0  Saw Sputum Results
-sp4_h_4        374      2   .3930481          0         1  Medication Taken Last Month for P...
-sp4_h_4_gi~n   226      1          0          0         0  Medication Taken Last Month for P...
-sp4_h_5        374      2   .1149733          0         1  Visited Governmental Hospital for...
-sp4_h_5_gi~n   329      1          0          0         0  Visited Governmental Hospital for...
+sp4_h_4        374      2   .3930481          0         1  Medication Taken Last Month for Present Illness
+sp4_h_4_gi~n   226      1          0          0         0  Medication Taken Last Month for Present Illness
+sp4_h_5        374      2   .1149733          0         1  Visited Governmental Hospital for Previous Illness
+sp4_h_5_gi~n   329      1          0          0         0  Visited Governmental Hospital for Previous Illness
 sp4_h_6        374      2   .1550802          0         1  Treatment for Previous Illness
 sp4_h_6_gi~n   316      1          0          0         0  Treatment for Previous Illness
-sp4_h_7        374      2   .1497326          0         1  Sputum or X-Rays Done for Previou...
-sp4_h_7_gi~n   317      2   .0031546          0         1  Sputum or X-Rays Done for Previou...
-sp4_h_8        374      2   .1657754          0         1  Diagnosis Given by Governmental H...
-sp4_h_8_gi~n   312      2   .0032051          0         1  Diagnosis Given by Governmental H...
+sp4_h_7        374      2   .1497326          0         1  Sputum or X-Rays Done for Previous Illness
+sp4_h_7_gi~n   317      2   .0031546          0         1  Sputum or X-Rays Done for Previous Illness
+sp4_h_8        374      2   .1657754          0         1  Diagnosis Given by Governmental Hospital
+sp4_h_8_gi~n   312      2   .0032051          0         1  Diagnosis Given by Governmental Hospital
 sp4_h_9        374      2    .315508          0         1  Past TB Treatment
 sp4_h_9_gi~n   255      2   .0078431          0         1  Past TB Treatment
 sp4_h_10       374      2   .6925134          0         1  For How Long Past TB Treatment
@@ -686,4 +686,4 @@ time_total    2199    192   37.68713       -439       715  Time in Clinic (min)
 time_waiting  2194   1628   33.41125  -451.3667  710.6667  Time Waiting (min)
 uatbc_faci~e   503    144   242128.8     113103    325222  Parent Agency Id
 uatbc_prov~d   469    149   213883.4     103242    325222  Agency Id
------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------

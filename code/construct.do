@@ -12,7 +12,7 @@
 
 	tostring form re_1_a dr_3a dr_5a_no dr_5b_no med_h_1 med_j_2 re_12_2 re_12_3 re_12_4 re_12_*_* sp3_h_24_2 , force replace
 	replace re_1 = 1 if re_1 > 1
-	
+
 	rename g* g_*
 
 	save "${directory}/constructed/sp-wave-1.dta" , replace
@@ -91,182 +91,182 @@
 
 // Save -------------------------------------------------------------------------------
 	save "${directory}/constructed/sp_both.dta" , replace
-	
-// Creating data for Diff in Diff and ANCOVA 
 
-	use "${directory}/constructed/sp_both.dta", clear 
-	
+// Creating data for Diff in Diff and ANCOVA
+
+	use "${directory}/constructed/sp_both.dta", clear
+
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 
-	
+				   med_l_any_3 med_k_any_9
+
 	keep qutub_id qutub_sample_updated trial_treatment trial_assignment case wave `quality'
 	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
-	drop if case == 7 
-	
-	save "${directory}/constructed/sp_analysis.dta", replace 
-	
-//Creating data for Diff in Diff
-	use "${directory}/constructed/sp_analysis.dta", clear 
-	
-	gen d_treat = 0 if trial_assignment == 0 // Creating dummy for trial_assignment
-	replace d_treat = 1 if trial_assignment == 1 
-	
-	gen d_tot = 0 if trial_treatment == 0 // Creating dummy for trial_treatment
-	replace d_tot = 1 if trial_treatment == 1 
-	
-	gen d_post = 0 if wave == 0  // Creating dummy for before or after treatment 
-	replace d_post = 1 if wave == 1 
-	
-	gen d_treatXpost = d_treat * d_post //Creating dummy for trial_assignment X treatment
-	
-	gen d_totXpost = d_tot * d_post // Creating dummy for trial_treatment X treatment 
-	
-	save "${directory}/constructed/sp_diff_in_diff.dta", replace
-	
-//Creating data for ANCOVA 
+	drop if case == 7
 
-	use "${directory}/constructed/sp_analysis.dta", clear 
-	
+	save "${directory}/constructed/sp_analysis.dta", replace
+
+//Creating data for Diff in Diff
+	use "${directory}/constructed/sp_analysis.dta", clear
+
+	gen d_treat = 0 if trial_assignment == 0 // Creating dummy for trial_assignment
+	replace d_treat = 1 if trial_assignment == 1
+
+	gen d_tot = 0 if trial_treatment == 0 // Creating dummy for trial_treatment
+	replace d_tot = 1 if trial_treatment == 1
+
+	gen d_post = 0 if wave == 0  // Creating dummy for before or after treatment
+	replace d_post = 1 if wave == 1
+
+	gen d_treatXpost = d_treat * d_post //Creating dummy for trial_assignment X treatment
+
+	gen d_totXpost = d_tot * d_post // Creating dummy for trial_treatment X treatment
+
+	save "${directory}/constructed/sp_diff_in_diff.dta", replace
+
+//Creating data for ANCOVA
+
+	use "${directory}/constructed/sp_analysis.dta", clear
+
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 
-				   
-	local j = 1 //Saving label variables 
+				   med_l_any_3 med_k_any_9
+
+	local j = 1 //Saving label variables
 	foreach i in `quality'{
 		local x`j' : variable label `i'
-		local j = `j' + 1 
+		local j = `j' + 1
 	}
-	
-	
-	egen unique_id = concat(qutub_id case wave) //Creating a unique id 
+
+
+	egen unique_id = concat(qutub_id case wave) //Creating a unique id
 	egen tag = tag(unique_id)
 	drop if tag == 0
 	drop unique_id tag med_l_any_1
-	
+
 	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment /// 
+				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id case) j (wave)
-					
-				   
+
+
 	rename trial_assignment0 trial_assignment // Keeping only one trial_assignment
 	rename trial_treatment0 trial_treatment
-	drop trial_assignment1 trial_treatment1 
-	
-	
-	
+	drop trial_assignment1 trial_treatment1
+
+
+
 	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 polypharmacy1 med_l_any_21 ///
 				   med_l_any_31 med_k_any_91
-				   
-	rename (`quality1') (`quality') //Renaming lagged variables to include in forest 
-	
+
+	rename (`quality1') (`quality') //Renaming lagged variables to include in forest
+
 	local j = 1 //Providing value labels
 	foreach i in `quality' {
 		label variable `i' "`x`j''"
 		local j = `j' + 1
 	}
-	
+
 	save "${directory}/constructed/sp_ancova.dta", replace //Saving data for ANCOVA analysis
-	
+
 //Creating data for Fig_3
-	
-	use "${directory}/constructed/sp_both.dta", clear 
-			   
-	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11 
-	
-	keep if wave == 1 
-	
-	keep if case == 1| case == 7 
-	
+
+	use "${directory}/constructed/sp_both.dta", clear
+
+	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
+
+	keep if wave == 1
+
+	keep if case == 1| case == 7
+
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 
-				   
-				   
-	local j = 1 //Saving value labels 
+				   med_l_any_3 med_k_any_9
+
+
+	local j = 1 //Saving value labels
 	foreach i in `quality'{
 		local x`j' : variable label `i'
-		local j = `j' + 1 
+		local j = `j' + 1
 	}
-	
+
 	keep qutub_id qutub_sample_updated trial_treatment trial_assignment case  `quality'
-	
-	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 /// Converting data to wide 
+
+	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 /// Converting data to wide
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id) j (case)
-					
+
 	unab quality7: correct7 dr_17 dr_47 re_17 re_37 re_47 med_any7 polypharmacy7 med_l_any_17 med_l_any_27 ///
 				   med_l_any_37 med_k_any_97
-				   
-	rename (`quality7') (`quality') 
-	
-	local j = 1 //Providing value labels 
+
+	rename (`quality7') (`quality')
+
+	local j = 1 //Providing value labels
 	foreach i in `quality' {
 		label variable `i' "`x`j''"
 		local j = `j' + 1
 	}
-	
+
 	save "${directory}/constructed/fig_3.dta", replace //Saving data for fig3
-	
- // Creating data for Fig_4 
- 
- 	
-	use "${directory}/constructed/sp_both.dta", clear 
-	
-	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11 
-	
-	keep if case == 1 
-	
+
+ // Creating data for Fig_4
+
+
+	use "${directory}/constructed/sp_both.dta", clear
+
+	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
+
+	keep if case == 1
+
 	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 
-				   
-				   
-	local j = 1 //Saving value labels 
+				   med_l_any_3 med_k_any_9
+
+
+	local j = 1 //Saving value labels
 	foreach i in `quality'{
 		local x`j' : variable label `i'
-		local j = `j' + 1 
+		local j = `j' + 1
 	}
-				   
-		
+
+
 	keep qutub_id qutub_sample_updated trial_treatment trial_assignment wave `quality'
-	
-	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 /// Converting data to wide 
+
+	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 /// Converting data to wide
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id) j (wave)
-					
+
 	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 polypharmacy1 med_l_any_11 med_l_any_21 ///
 				   med_l_any_31 med_k_any_91
-				   
-	rename (`quality1') (`quality') 
-	
-	local j = 1 // Providing value labels 
+
+	rename (`quality1') (`quality')
+
+	local j = 1 // Providing value labels
 	foreach i in `quality' {
 		label variable `i' "`x`j''"
 		local j = `j' + 1
 	}
-	
-	save "${directory}/constructed/fig_4.dta", replace 
-	
+
+	save "${directory}/constructed/fig_4.dta", replace
+
 // Creating data for analysis of non-trial groups/table_3
 
-	use "${directory}/constructed/sp_both.dta", clear 
-	
-	keep if qutub_sample_updated == 8 | qutub_sample_updated == 9 
-	   
-	drop if case == 7 
-	
+	use "${directory}/constructed/sp_both.dta", clear
+
+	keep if qutub_sample_updated == 8 | qutub_sample_updated == 9
+
+	drop if case == 7
+
 	gen d_t = (wave == 0 & ppia_facility_0 == 1)  | (wave == 1 & ppia_facility_1 == 1)
-	
-	egen check = group(ppia_facility_0 ppia_facility_1), label 
-	
-	save "${directory}/constructed/table_3.dta", replace 
+
+	egen check = group(ppia_facility_0 ppia_facility_1), label
+
+	save "${directory}/constructed/table_3.dta", replace
 
 // Creating data for analysis of Case-7/table_4
-	
+
 	use "${directory}/constructed/sp_both.dta", clear
-	
+
 	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
-	
+
 	keep if case == 7
-	
-	save "${directory}/constructed/table_4.dta", replace 
+
+	save "${directory}/constructed/table_4.dta", replace
 ---
 
 iecodebook export ///
@@ -275,5 +275,3 @@ iecodebook export ///
 
 
 // End of dofile
-
-
