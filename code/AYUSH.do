@@ -188,7 +188,5 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 
 	graph export "${directory}/outputs/balance_table_graph.eps" , replace // Exporting the combined graph
----
-
 
 // Have a great day!

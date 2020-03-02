@@ -13,6 +13,8 @@ sysdir set PLUS "${directory}/ado/"
   ssc install betterbar , replace
   cap ssc install forest
 
+  set scheme uncluttered
+
 // Globals -------------------------------------------------------------------------------------
 
   // title
