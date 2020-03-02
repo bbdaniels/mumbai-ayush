@@ -57,10 +57,10 @@ sysdir set PLUS "${directory}/ado/"
      using "${directory}/data/sp-wave-1.dta" ///
      , replace copy hash text
 
-
+-
 // Part 2: Build constructed data from raw data ------------------------------------------------
 
-*  do "${directory}/code/construct.do"
+  run "${directory}/code/construct.do"
 
 // Part 3: Analysis ----------------------------------------------------------------------------
 

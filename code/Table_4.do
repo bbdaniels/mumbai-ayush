@@ -6,7 +6,7 @@
 
 	mat t4=J(12,8,0) //Constructing a matrix
 
-	unab quality :  dr_1 dr_4 re_1 med_any polypharmacy med_l_any_2 ///
+	unab quality :  dr_1 dr_4 re_1 med_any med med_l_any_2 ///
 				    med_l_any_3 med_k_any_9
 
 	 foreach i in `quality' { //Saving value labels
@@ -14,7 +14,7 @@
 	}
 
 	matrix rownames t4 = "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  ///
-						 "`lblmed_any'" "`lblpolypharmacy'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_any'" "`lblmed'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
 						 "`lblmed_k_any_9'" "Correct Management" "Sputum AFB" "Gene Expert" "Started TB Treatment"
 
 	matrix colnames t4 = "Control" "Treatment" "Effect" "Std Error" "P-Value" "Effect" "Std Error" "P-Value"

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------------------
 // Tabulating SP cases in qutub_sample_updated in wave 0 and 1
-	use "${directory}/constructed/sp_both.dta", clear
+	use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	local row = 6  // Starting row to export a table in row 6 in excel
 	local row2 = 4 // Starting row2 to give headings to tables exported
@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------------------------
 // Tracking cases across rounds
-use "${directory}/constructed/sp_both.dta", clear
+use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep qutub_id case wave qutub_sample_updated
 		duplicates drop
@@ -129,7 +129,7 @@ use "${directory}/constructed/sp_both.dta", clear
 // ---------------------------------------------------------------------------------------------
 // Creating Balance Tables and Graphs
 
-	use "${directory}/constructed/sp_both.dta", clear
+	use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
   // Transforming Analysis Variables
 	foreach var of varlist g_6-g_10 {
@@ -154,7 +154,7 @@ use "${directory}/constructed/sp_both.dta", clear
 
 	unab Balance : cp_17_* cp_18 cp_19 cp_20 cp_21 //Varlists for the types of variables for balance table
 	unab Process : g_* cp_14d_mm checklist_essential_pct
-	unab Quality : correct* cb* dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab Quality : correct* cb* dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 	foreach i in Balance Process Quality{ // Creating balance tables for the 3 kinds of variables
@@ -166,7 +166,7 @@ use "${directory}/constructed/sp_both.dta", clear
 
 	unab Balance : cp_17_* cp_18 cp_19 cp_20 cp_21 //Varlists for the types of variables for balance table graphs
 	unab Process : g_* cp_14d_mm checklist_essential_pct
-	unab Quality : correct* cb* dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab Quality : correct* cb* dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 	foreach i in Balance Process Quality { // Creating balance table graphs for the 3 kinds of variables
@@ -190,5 +190,5 @@ use "${directory}/constructed/sp_both.dta", clear
 	graph export "${directory}/outputs/balance_table_graph.eps" , replace // Exporting the combined graph
 ---
 
-	
+
 // Have a great day!

@@ -20,12 +20,10 @@
 // Append --------------------------------------------------------------------------------------
 	use "${directory}/constructed/sp-wave-0.dta"
 
-
 	qui append using ///
 	"${directory}/constructed/sp-wave-1.dta" ///
-  /// "${directory}/data/sp-wave-2.dta" ///
 	, gen(wave) force
-	label def wave 0 "Pre-PPIA" 1 "PPIA" // 2 "Post-PPIA"
+	label def wave 0 "Pre-PPIA" 1 "PPIA"
 	label val wave wave
 
 	drop *given
@@ -33,7 +31,7 @@
 // Cleaning ------------------------------------------------------------------------------------
 
 	drop sample
-	keep if qutub_sample > 6 //Keeping only AYUSH samples
+	keep if qutub_sample > 6 // Keeping only AYUSH samples
 
 	lab var correct "Correct"
 	lab var dr_4 "Referral"
@@ -41,144 +39,138 @@
 	label define case 7 "SP7", add
 	label values case case
 
-	label define trial_assignmentlbl 0 control 1 treatment
-	label values trial_assignment trial_assignmentlbl
-
-
-
+	label define trial_assignment 0 control 1 treatment
+	label values trial_assignment trial_assignment
 
 // New variables -------------------------------------------------------------------------------
 
   // Engagement indicator
   gen engaged = 0
-  forvalues i = 0/2 {
+  forvalues i = 0/1 {
     replace engaged = 1 if wave == `i' & ppia_facility_`i' == 1
   }
+    lab var engaged "PPIA in Current Round"
+    lab val engaged yesno
 
-	clonevar qutub_sample_updated=qutub_sample // Creating sample types PPIA Control and Treatment
-		recode qutub_sample_updated (7 = 10) if trial_assignment == 0
-		lab def qutub_sample 10 "Control" , modify
-		recode qutub_sample_updated 7 = 11 if trial_assignment == 1
-		lab def qutub_sample 11 "Treatment" , modify
-		replace qutub_sample_updated = 8 if qutub_sample_updated == 7
+  // Create sample types PPIA Control and Treatment
+	clonevar qutub_sample_updated = qutub_sample
+		recode qutub_sample_updated (7 = 10) if (trial_assignment == 0) // Trial control
+		  lab def qutub_sample 10 "Control" , modify
+		recode qutub_sample_updated (7 = 11) if (trial_assignment == 1) // Trial treatment
+		  lab def qutub_sample 11 "Treatment" , modify
+		replace qutub_sample_updated = 8 if (qutub_sample_updated == 7) // Non-assigned but labeled as trial
 
-	replace med_any = 0 if med == 0 //Creating indicator for any medicine prescribed
+  // Create indicator for any medicine prescribed
+	replace med_any = 0 if med == 0
 	replace med_any = 1 if (med!=0 & med<.)
+    lab var med_any "Any Medication"
 
-	gen polypharmacy = . //Creating indicator for mutiple medicines prescribed
-	replace polypharmacy = 0 if (med == 0 | med == 1)
-	replace polypharmacy = 1 if (med > 1  & med < .)
-	label variable polypharmacy polypharmacy
-	label values polypharmacy yesno
+  // Creating indicator for provider age groups
+  	gen cp_17_a = (cp_17 == 1)
+  	label variable cp_17_a "Provider Age < 30"
 
-	gen cp_17_a = . //Creating indicator for provider age <30
-	replace cp_17_a = 1 if cp_17 == 1
-	replace cp_17_a = 0 if (cp_17 == 2 | cp_17 == 3)
-	label variable cp_17_a "Provider age < 30"
+  	gen cp_17_b = (cp_17 == 2)
+  	label variable cp_17_b "Provider Age 30-50"
 
-	gen cp_17_b = . // Creating indicator for provider age 30-50
-	replace cp_17_b = 1 if cp_17 == 2
-	replace cp_17_b = 0 if (cp_17 == 1 | cp_17 == 3)
-	label variable cp_17_b "Provider age 30-50"
+  	gen cp_17_c = (cp_17 == 3)
+  	label variable cp_17_c "Provider Age >50"
 
-	gen cp_17_c = . // Creating indicator for provider age>50
-	replace cp_17_c = 1 if cp_17 == 3
-	replace cp_17_c = 0 if (cp_17 == 1 | cp_17 == 2)
-	label variable cp_17_c "Provider age >50"
+    lab val cp_17_? yesno
 
+  // Label cleaning
 	label variable correct "Correct Management"
 
-
 // Save -------------------------------------------------------------------------------
-	save "${directory}/constructed/sp_both.dta" , replace
+  compress
+	save "${directory}/constructed/analysis-ayush-panel.dta" , replace
 
-// Creating data for Diff in Diff and ANCOVA
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
 
-	use "${directory}/constructed/sp_both.dta", clear
+// Create LONG data for Diff-in-Diff
+use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 	keep qutub_id qutub_sample_updated trial_treatment trial_assignment case wave `quality'
 	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
 	drop if case == 7
 
-	save "${directory}/constructed/sp_analysis.dta", replace
+	save "${directory}/constructed/analysis-trial-panel.dta", replace
 
-//Creating data for Diff in Diff
-	use "${directory}/constructed/sp_analysis.dta", clear
+// Create data for Diff-in-Diff ------------------------------------------------
+use "${directory}/constructed/analysis-trial-panel.dta", clear
 
-	gen d_treat = 0 if trial_assignment == 0 // Creating dummy for trial_assignment
-	replace d_treat = 1 if trial_assignment == 1
+	gen d_treat = trial_assignment // Dummy for trial_assignment
+  lab var d_treat "Assigned to Treatment"
+    lab val d_treat yesno
 
-	gen d_tot = 0 if trial_treatment == 0 // Creating dummy for trial_treatment
-	replace d_tot = 1 if trial_treatment == 1
+	gen d_tot = trial_treatment // Dummy for trial_treatment
+    lab var d_treat "Joined PPIA in Wave 1"
+    lab val d_tot yesno
 
-	gen d_post = 0 if wave == 0  // Creating dummy for before or after treatment
-	replace d_post = 1 if wave == 1
+	gen d_post = wave // Dummy for before or after treatment
+  	lab var d_post "Post-intervention Period"
+    lab val d_post yesno
 
-	gen d_treatXpost = d_treat * d_post //Creating dummy for trial_assignment X treatment
+	gen d_treatXpost = d_treat * d_post // Dummy for trial_assignment X treatment
+    lab var d_treatXpost "Treatment + Post-intervention"
+    lab val d_treatXpost yesno
 
-	gen d_totXpost = d_tot * d_post // Creating dummy for trial_treatment X treatment
+	gen d_totXpost = d_tot * d_post // Dummy for trial_treatment X treatment
+    lab var d_totXpost "PPIA + Post-intervention"
+    lab val d_totXpost yesno
 
-	save "${directory}/constructed/sp_diff_in_diff.dta", replace
+	save "${directory}/constructed/analysis-trial-did.dta", replace
 
-//Creating data for ANCOVA
+// Creating WIDE data for analysis with lags ------------------------------------
+use "${directory}/constructed/analysis-trial-panel.dta", clear
 
-	use "${directory}/constructed/sp_analysis.dta", clear
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
+	  med_l_any_3 med_k_any_9
 
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
-				   med_l_any_3 med_k_any_9
-
-	local j = 1 //Saving label variables
-	foreach i in `quality'{
-		local x`j' : variable label `i'
-		local j = `j' + 1
+	foreach i in `quality' trial_assignment trial_treatment qutub_sample_updated {
+		local `i' : variable label `i'
 	}
 
+  duplicates drop qutub_id case wave , force // 1 extra observation
 
-	egen unique_id = concat(qutub_id case wave) //Creating a unique id
-	egen tag = tag(unique_id)
-	drop if tag == 0
-	drop unique_id tag med_l_any_1
+	reshape wide ///
+    `quality' qutub_sample_updated trial_assignment trial_treatment ///
+		, i(qutub_id case) j(wave)
 
-	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
-				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
-					, i(qutub_id case) j (wave)
+	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 med1 med_l_any_11 med_l_any_21 ///
+    med_l_any_31 med_k_any_91
 
+	rename (`quality1') (`quality') // Rename Round 1 variables -- Round 0 have "0" suffix
 
-	rename trial_assignment0 trial_assignment // Keeping only one trial_assignment
-	rename trial_treatment0 trial_treatment
-	drop trial_assignment1 trial_treatment1
+  // Keep only one trial assignment
+	rename trial_assignment1 trial_assignment
+	rename trial_treatment1 trial_treatment
+	drop trial_assignment0 trial_treatment0
 
+  // Keep only one qutub_sample_updated
+	rename qutub_sample_updated1 qutub_sample_updated
+	drop qutub_sample_updated0
 
-
-	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 polypharmacy1 med_l_any_21 ///
-				   med_l_any_31 med_k_any_91
-
-	rename (`quality1') (`quality') //Renaming lagged variables to include in forest
-
-	local j = 1 //Providing value labels
-	foreach i in `quality' {
-		label variable `i' "`x`j''"
-		local j = `j' + 1
+	foreach i in `quality' trial_assignment trial_treatment qutub_sample_updated {
+		label variable `i' "``i''"
+		cap label variable `i'0 "``i'' (Lag)"
 	}
 
-	save "${directory}/constructed/sp_ancova.dta", replace //Saving data for ANCOVA analysis
+  drop med_l_any_1*
+  compress
+	save "${directory}/constructed/analysis-trial-wide.dta", replace // Saving data for lagged-variables analysis
 
-//Creating data for Fig_3
+//Creating data for Fig_3: Case 1 + 7 consistency
+use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
-	use "${directory}/constructed/sp_both.dta", clear
+	keep if wave == 1 & (case == 1 | case == 7)
 
-	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
-
-	keep if wave == 1
-
-	keep if case == 1| case == 7
-
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
-
 
 	local j = 1 //Saving value labels
 	foreach i in `quality'{
@@ -188,11 +180,11 @@
 
 	keep qutub_id qutub_sample_updated trial_treatment trial_assignment case  `quality'
 
-	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 /// Converting data to wide
+	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 /// Converting data to wide
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id) j (case)
 
-	unab quality7: correct7 dr_17 dr_47 re_17 re_37 re_47 med_any7 polypharmacy7 med_l_any_17 med_l_any_27 ///
+	unab quality7: correct7 dr_17 dr_47 re_17 re_37 re_47 med_any7 med7 med_l_any_17 med_l_any_27 ///
 				   med_l_any_37 med_k_any_97
 
 	rename (`quality7') (`quality')
@@ -205,18 +197,13 @@
 
 	save "${directory}/constructed/fig_3.dta", replace //Saving data for fig3
 
- // Creating data for Fig_4
+// Creating data for Fig_4: Case 1 consistency by roundss
+use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
+	keep if (case == 1)
 
-	use "${directory}/constructed/sp_both.dta", clear
-
-	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
-
-	keep if case == 1
-
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
-
 
 	local j = 1 //Saving value labels
 	foreach i in `quality'{
@@ -224,14 +211,13 @@
 		local j = `j' + 1
 	}
 
-
 	keep qutub_id qutub_sample_updated trial_treatment trial_assignment wave `quality'
 
-	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 /// Converting data to wide
+	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 /// Converting data to wide
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id) j (wave)
 
-	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 polypharmacy1 med_l_any_11 med_l_any_21 ///
+	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 med1 med_l_any_11 med_l_any_21 ///
 				   med_l_any_31 med_k_any_91
 
 	rename (`quality1') (`quality')
@@ -242,17 +228,19 @@
 		local j = `j' + 1
 	}
 
-	save "${directory}/constructed/fig_4.dta", replace
+  save "${directory}/constructed/fig_4.dta", replace
 
 // Creating data for analysis of non-trial groups/table_3
 
-	use "${directory}/constructed/sp_both.dta", clear
+	use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if qutub_sample_updated == 8 | qutub_sample_updated == 9
 
-	drop if case == 7
+	drop if (case == 7)
 
 	gen d_t = (wave == 0 & ppia_facility_0 == 1)  | (wave == 1 & ppia_facility_1 == 1)
+    lab var d_t "PPIA in Round"
+    lab val d_t yesno
 
 	egen check = group(ppia_facility_0 ppia_facility_1), label
 
@@ -260,18 +248,12 @@
 
 // Creating data for analysis of Case-7/table_4
 
-	use "${directory}/constructed/sp_both.dta", clear
+	use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
 
 	keep if case == 7
 
 	save "${directory}/constructed/table_4.dta", replace
----
-
-iecodebook export ///
-  using "${directory}/constructed/sp-ayush.dta" ///
-  , copy hash reset replace text
-
 
 // End of dofile

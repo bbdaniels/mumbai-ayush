@@ -1,7 +1,7 @@
 
-	 use "${directory}/constructed/sp_diff_in_diff.dta", clear
+	 use "${directory}/constructed/analysis-trial-did.dta", clear
 
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 
@@ -14,7 +14,7 @@
 	}
 
 	matrix rownames t2 = "`lblcorrect'" "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  "`lblre_3'" "`lblre_4'" ///
-						 "`lblmed_any'" "`lblpolypharmacy'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_any'" "`lblmed'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
 						 "`lblmed_k_any_9'"
 
 	matrix colnames t2 = "Control" "Treatment" "Control" "Treatment" "Effect" "Std Error" "P-Value" "Effect" "Std Error" "P-Value"
@@ -94,9 +94,9 @@
 
 	// ANCOVA ITT AND TOT
 
-	use "${directory}/constructed/sp_ancova.dta", clear
+	use "${directory}/constructed/analysis-trial-wide.dta", clear
 
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 

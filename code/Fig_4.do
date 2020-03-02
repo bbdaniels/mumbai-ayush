@@ -1,7 +1,7 @@
 
 	 use "${directory}/constructed/fig_4.dta", clear
 
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any polypharmacy med_l_any_1 med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 	foreach i in `quality' { //Saving value labels
@@ -11,7 +11,7 @@
 	mat case1=J(12,3,0) //Constructing a matrix to save results in
 
 	matrix rownames case1 = "`lblcorrect'" "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  "`lblre_3'" "`lblre_4'" ///
-						 "`lblmed_any'" "`lblpolypharmacy'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_any'" "`lblmed'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
 						 "`lblmed_k_any_9'"
 
 	matrix colnames case1 = "Incorrect" "Correct" "_n"
@@ -41,7 +41,7 @@
 
 
 	  label define lblindicator 1 "`lblcorrect'" 2 "`lbldr_1'" 3 "`lbldr_4'" 4 "`lblre_1'" 5  "`lblre_3'" 6 "`lblre_4'" ///
-						7 "`lblmed_any'" 8 "`lblpolypharmacy'" 9 "`lblmed_l_any_1'" 10 "`lblmed_l_any_2'" 11 "`lblmed_l_any_3'" ///
+						7 "`lblmed_any'" 8 "`lblmed'" 9 "`lblmed_l_any_1'" 10 "`lblmed_l_any_2'" 11 "`lblmed_l_any_3'" ///
 						12 "`lblmed_k_any_9'"
 	  label values quality_indicators lblindicator //Value labels for quality_indicators
 
