@@ -2,7 +2,7 @@
 
 // Set global directory locations
 global rawdata "/Users/bbdaniels/Box/_Papers/Ruchika PPIA"
-global directory "/Users/bbdaniels/GitHub/mumbai/mumbai-ppia"
+global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 
 // Install packages ------------------------------------------------------------------------------
 sysdir set PLUS "${directory}/ado/"
