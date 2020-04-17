@@ -7,7 +7,7 @@
 	mat t4=J(12,8,0) //Constructing a matrix
 
 	unab quality :  dr_1 dr_4 re_1 med_any med med_l_any_2 ///
-				    med_l_any_3 med_k_any_9
+				    med_l_any_3 med_k_any_9 sp7_id_1
 
 	 foreach i in `quality' { //Saving value labels
 		local lbl`i': variable label `i'
@@ -15,7 +15,7 @@
 
 	matrix rownames t4 = "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  ///
 						 "`lblmed_any'" "`lblmed'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
-						 "`lblmed_k_any_9'" "Correct Management" "Sputum AFB" "Gene Expert" "Started TB Treatment"
+						 "`lblmed_k_any_9'" "`lblsp7_id_1'" "Sputum AFB" "Gene Expert" "Started TB Treatment"
 
 	matrix colnames t4 = "Control" "Treatment" "Effect" "Std Error" "P-Value" "Effect" "Std Error" "P-Value"
 
@@ -50,7 +50,7 @@
 	putexcel set "${directory}/outputs/Table_4.xlsx", replace //Saving results in excel
 
 	putexcel D5 = matrix(t4), names
-	forvalues  i = 4/7{
+	forvalues  i = 5/7{
 		putexcel G1`i':L1`i' = "."
 	}
 	putexcel E4:F4 = "Mean", merge hcenter
@@ -64,7 +64,7 @@
 	forest reg /// Graph for ITT
 	(`quality') ///
 		, t(trial_assignment) ///
-		vce(cluster qutub_id) bh graphopts(title("ITT-SP7")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("ITT-SP7") xtitle("Effect of treatment")) sort(global)
 
 		graph save "${directory}/outputs/ITT-SP7.gph", replace
 
@@ -72,7 +72,7 @@
     forest ivregress 2sls /// Graph for TOT
 	(`quality') ///
 		, t((trial_treatment = trial_assignment)) ///
-		vce(cluster qutub_id) bh graphopts(title("TOT-SP7")) sort(global)
+		vce(cluster qutub_id) bh graphopts(title("TOT-SP7") xtitle("Effect of treatment")) sort(global)
 
 		graph save "${directory}/outputs/TOT-SP7.gph", replace
 

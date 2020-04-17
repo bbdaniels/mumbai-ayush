@@ -9,7 +9,7 @@
 
 	forest reg /// Graph for Diff in Diff in Non-Trial Groups
 	(`quality') ///
-		, t(d_t) controls(wave i.check i.case i.qutub_sample_updated) ///
+		, t(d_t) controls(wave i.check i.case) ///
 		vce(cluster qutub_id)
 
 		graph export "${directory}/outputs/Non-Trial_DiffinDiff.eps", replace

@@ -1,17 +1,17 @@
 
 	 use "${directory}/constructed/fig_4.dta", clear
 
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
+	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 	foreach i in `quality' { //Saving value labels
 		local lbl`i': variable label `i'
 	}
 
-	mat case1=J(12,3,0) //Constructing a matrix to save results in
+	mat case1=J(11,3,0) //Constructing a matrix to save results in
 
 	matrix rownames case1 = "`lblcorrect'" "`lbldr_1'"  "`lbldr_4'" "`lblre_1'"  "`lblre_3'" "`lblre_4'" ///
-						 "`lblmed_any'" "`lblmed'"  "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
+						 "`lblmed_any'" "`lblmed_l_any_1'" "`lblmed_l_any_2'"  "`lblmed_l_any_3'" ///
 						 "`lblmed_k_any_9'"
 
 	matrix colnames case1 = "Incorrect" "Correct" "_n"
@@ -28,7 +28,7 @@
 	}
 
 
-	forvalues i = 1/12{ //Rounding off values in the matrix
+	forvalues i = 1/11{ //Rounding off values in the matrix
 		forvalues j = 1/2{
 			matrix case1[`i', `j'] = round(case1[`i',`j'], 0.001)
 		}
@@ -41,17 +41,22 @@
 
 
 	  label define lblindicator 1 "`lblcorrect'" 2 "`lbldr_1'" 3 "`lbldr_4'" 4 "`lblre_1'" 5  "`lblre_3'" 6 "`lblre_4'" ///
-						7 "`lblmed_any'" 8 "`lblmed'" 9 "`lblmed_l_any_1'" 10 "`lblmed_l_any_2'" 11 "`lblmed_l_any_3'" ///
-						12 "`lblmed_k_any_9'"
+						7 "`lblmed_any'" 8 "`lblmed_l_any_1'" 9 "`lblmed_l_any_2'" 10 "`lblmed_l_any_3'" ///
+						11 "`lblmed_k_any_9'"
 	  label values quality_indicators lblindicator //Value labels for quality_indicators
 
--
+
 	  tw /// Construct Figure 4
-      (scatter quality_indicators incorret_case, mc(black) msize(*2) ylabel(1 2 3 4 5 6 7 8 9 10 11 12, valuelabel)) ///
+      (scatter quality_indicators incorret_case, mc(black) msize(*2) ylabel(1 2 3 4 5 6 7 8 9 10 11, valuelabel)) ///
       (pcarrow quality_indicators incorret_case quality_indicators correct_case , lw(thin) lc(black) mc(black)) ///
-    , ytitle("Quality Indicators") title("Difference in Case1 Outputs in Wave-1") ///
-      legend(on order(1 "Not Observed in Wave 1" 2 "Observed in Wave 1")) yscale(reverse noline) xscale(noline) ylab(,notick)
+    , ytitle("") ///
+      legend(on order(1 "Not Observed in Wave 0" 2 "Observed in Wave 0")) yscale(reverse noline) xscale(noline) ylab(,notick)
 
 	  graph export "${directory}/outputs/Consistency_Case1.eps", replace //Exporting Fig_4
 
+	  
+	  
+	   tw ///
+	   (scatter quality_indicators incorret_case, /*mc(black) msize(*2*/ ylabel(1 2 3 4 5 6 7 8 9 10 11 12, valuelabel)) ///
+	   || scatter quality_indicators correct_case , legend(order(1 	"Incorrect" 2 "Correct"))||  pcarrow quality_indicators incorret_case quality_indicators correct_case, ytitle("Quality Indicators") title("Difference in Case7 Outputs") //Fig_3
 // End of dofile
