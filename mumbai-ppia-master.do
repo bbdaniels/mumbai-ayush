@@ -12,7 +12,9 @@ sysdir set PLUS "${directory}/ado/"
   ssc install ietoolkit , replace
   ssc install betterbar , replace
   ssc install randtreat , replace
-  cap ssc install forest
+
+  net from "https://github.com/bbdaniels/stata/raw/master/"
+    net install forest , replace
 
   set scheme uncluttered
 
