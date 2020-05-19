@@ -5,6 +5,7 @@
 
 	tostring form dr_5b_no re_1_a med_h_1 med_j_2 cp_13 med_f_2 med_f_3 re_*_c re_2_c re_11_a re_12_*_* cp_12 cp_12_3 re_4_a, force replace
 
+	
 	save "${directory}/constructed/sp-wave-0.dta" , replace
 
 // Cleanup: Wave 1 -----------------------------------------------------------------------------
@@ -14,6 +15,8 @@
 	replace re_1 = 1 if re_1 > 1
 
 	rename g* g_*
+	
+	replace dr_4 = 0 if dr_4 == 3
 
 	save "${directory}/constructed/sp-wave-1.dta" , replace
 
@@ -186,9 +189,10 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	unab quality7: correct7 dr_17 dr_47 re_17 re_37 re_47 med_any7 med7 med_l_any_17 med_l_any_27 ///
 				   med_l_any_37 med_k_any_97
+				   
 
 	rename (`quality7') (`quality')
-
+	
 	local j = 1 //Providing value labels
 	foreach i in `quality' {
 		label variable `i' "`x`j''"
@@ -202,7 +206,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if (case == 1)
 
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
+	unab quality : checklist correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
 	local j = 1 //Saving value labels
@@ -211,13 +215,13 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 		local j = `j' + 1
 	}
 
-	keep qutub_id qutub_sample_updated trial_treatment trial_assignment wave `quality'
+	keep checklist qutub_id qutub_sample_updated trial_treatment trial_assignment wave `quality'
 
-	reshape wide correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 /// Converting data to wide
+	reshape wide checklist correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 /// Converting data to wide
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id) j (wave)
 
-	unab quality1: correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 med1 med_l_any_11 med_l_any_21 ///
+	unab quality1: checklist1 correct1 dr_11 dr_41 re_11 re_31 re_41 med_any1 med1 med_l_any_11 med_l_any_21 ///
 				   med_l_any_31 med_k_any_91
 
 	rename (`quality1') (`quality')
