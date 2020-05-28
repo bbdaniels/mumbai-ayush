@@ -1,21 +1,17 @@
-// Table 2
+// Diff in Diff Output
 
   use "${directory}/constructed/analysis-trial-did.dta", clear
 
-  unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
-    med_l_any_3 med_k_any_9
+  unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 ///
+				 med_l_any_2 med_l_any_3 med_k_any_9
+				 
+  local quality1 "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 
-  // Saving variable labels and Constructing a matrix to save results in
-  local nRows = 0
-    foreach i in `quality' {
-      local thisLabel: variable label `i'
-      local rowNames = `" `rowNames' "`thisLabel'"  "'
-      local ++nRows
-    }
-
-    mat t2 = J(`nRows',10,0)
-    matrix rownames t2 = `rowNames'
-    matrix colnames t2 = "Control" "Treatment" "Control" "Treatment" "Effect" "Std Error" "P-Value" "Effect" "Std Error" "P-Value"
+	valuelabels `quality1', name(t2) columns(10) //Create matrix 
+	
+    matrix colnames t2 = "Control" "Treatment" "Control" "Treatment" ///
+						 "Effect" "Std Error" "P-Value" "Effect" ///
+						 "Std Error" "P-Value"
 
   //4 groups according to wave and trial_assignment
   egen group = group(wave trial_assignment), label
@@ -23,7 +19,7 @@
  // Put statistics in matrix
   local row = 0
   foreach i in `quality' {
-    local row = ++row
+    local row = `row' + 1
 
     quietly reg `i' d_treatXpost d_treat d_post i.case, vce(cluster qutub_id) //Diff in Diff ITT
 
@@ -37,7 +33,7 @@
     mat t2[`row', 9] = _se[d_totXpost] //Standard Error
     mat t2[`row', 10] =  2*normal(-abs(_b[d_totXpost]/_se[d_totXpost])) //P value
 
-    quietly tabstat `i', by(group) save //Means of the 4 groups
+    quietly tabstat `i', by(group) save //Mean values of the 4 groups
 
     mat t2[`row',1] = r(Stat1)
     mat t2[`row',2] = r(Stat2)
@@ -45,13 +41,15 @@
     mat t2[`row',4] = r(Stat4)
   }
 
-  forvalues i = 1/`nRows'{ //Rounding off values
+  local nRows `= rowsof(t2)'
+  
+  forvalues i = 1/`nRows'{ //Round off values
     forvalues j = 1/10 {
       matrix t2[`i', `j'] = round(t2[`i',`j'], 0.001)
     }
   }
 
-  putexcel set "${directory}/outputs/Table_2.xlsx", replace //Saving results in excel
+  putexcel set "${directory}/outputs/Table_2.xlsx", replace //Save results in excel
 
   putexcel D7=matrix(t2), names
 
@@ -72,16 +70,25 @@
   forest ivregress 2sls /// Graph for Diff in Diff TOT
   (`quality') ///
     , t((d_totXpost d_tot  = d_treat d_treatXpost)) controls(i.case d_post) ///
-    vce(cluster qutub_id) bh graphopts(title("Diff in Diff : TOT")) sort(global)
+    vce(cluster qutub_id) bh sort(global) ///
+	graphopts(title("Diff in Diff : TOT") ///
+	ylab(,notick nogrid) xlab(,notick nogrid) ///
+	xtitle("Effect of treatment") ///
+	graphregion(color(white) lwidth(large)))
 
     graph save "${directory}/outputs/Diff_in_Diff_TOT.gph", replace //Saving
+
 
 
   forest reg /// Graph for Diff in Diff ITT
   (`quality') ///
     , t(d_treatXpost) controls(d_treat d_post i.case) ///
-    vce(cluster qutub_id) bh graphopts(title("Diff in Diff : ITT")) sort(global)
-
+    vce(cluster qutub_id) bh sort(global) ///
+	graphopts(title("Diff in Diff : ITT") ///
+	ylab(,notick nogrid) xlab(,notick nogrid) ///
+	xtitle("Effect of treatment") ///
+	graphregion(color(white) lwidth(large)))
+		
     graph save "${directory}/outputs/Diff_in_Diff_ITT.gph", replace //Saving
 
 
@@ -96,14 +103,22 @@
   forest reg /// Graph for ITT usig ANCOVA
   (`quality') ///
     , t(trial_assignment) controls(i.case @0) ///
-    vce(cluster qutub_id) bh graphopts(title("ANCOVA : ITT")) sort(global)
+    vce(cluster qutub_id) bh sort(global) ///
+	graphopts(title("ANCOVA : ITT") ///
+	ylab(,notick nogrid) xlab(,notick nogrid) ///
+	xtitle("Effect of treatment") ///
+	graphregion(color(white) lwidth(large)))
 
     graph save "${directory}/outputs/ANCOVA_ITT.gph", replace
 
     forest ivregress 2sls /// Graph for TOT using ANCOVA
   (`quality') ///
     , t((trial_treatment = trial_assignment)) controls(i.case @0) ///
-    vce(cluster qutub_id) bh graphopts(title("ANCOVA : TOT")) sort(global)
+    vce(cluster qutub_id) bh sort(global) ///
+	graphopts(title("ANCOVA : TOT") ///
+	ylab(,notick nogrid) xlab(,notick nogrid) ///
+	xtitle("Effect of treatment") ///
+	graphregion(color(white) lwidth(large)))
 
     graph save "${directory}/outputs/ANCOVA_TOT.gph", replace //Saving
 
@@ -111,7 +126,8 @@
       "${directory}/outputs/Diff_in_Diff_ITT.gph" ///
       "${directory}/outputs/Diff_in_Diff_TOT.gph" ///
       "${directory}/outputs/ANCOVA_ITT.gph" ///
-      "${directory}/outputs/ANCOVA_TOT.gph" , xcommon ysize(6) altshrink
+      "${directory}/outputs/ANCOVA_TOT.gph", xcommon ysize(6) altshrink ///
+	  graphregion(color(white) lwidth(large))
 
     graph export "${directory}/outputs/DID_ANCOVA_Combine.eps", replace
 

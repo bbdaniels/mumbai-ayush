@@ -167,7 +167,7 @@ use "${directory}/constructed/analysis-trial-panel.dta", clear
   compress
 	save "${directory}/constructed/analysis-trial-wide.dta", replace // Saving data for lagged-variables analysis
 
-//Creating data for Fig_3: Case 1 + 7 consistency
+//Creating data for Fig_3: Case 1 + 7 sensitivity and specificity 
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if wave == 1 & (case == 1 | case == 7)
@@ -193,15 +193,15 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	rename (`quality7') (`quality')
 	
-	local j = 1 //Providing value labels
+	local j = 1 //Provide value labels
 	foreach i in `quality' {
 		label variable `i' "`x`j''"
 		local j = `j' + 1
 	}
 
-	save "${directory}/constructed/fig_3.dta", replace //Saving data for fig3
+	save "${directory}/constructed/fig_2B.dta", replace //Saving data for fig3
 
-// Creating data for Fig_4: Case 1 consistency by roundss
+// Creating data for Fig_4: Case 1 sensitivity and specificity
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if (case == 1)
@@ -209,7 +209,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 	unab quality : checklist correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
 				   med_l_any_3 med_k_any_9
 
-	local j = 1 //Saving value labels
+	local j = 1 //Save value labels
 	foreach i in `quality'{
 		local x`j' : variable label `i'
 		local j = `j' + 1
@@ -217,7 +217,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep checklist qutub_id qutub_sample_updated trial_treatment trial_assignment wave `quality'
 
-	reshape wide checklist correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 /// Converting data to wide
+	reshape wide checklist correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 /// Convert data to wide
 				   med_l_any_3 med_k_any_9 qutub_sample_updated trial_assignment trial_treatment ///
 					, i(qutub_id) j (wave)
 
@@ -226,13 +226,13 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	rename (`quality1') (`quality')
 
-	local j = 1 // Providing value labels
+	local j = 1 // Provide value labels
 	foreach i in `quality' {
 		label variable `i' "`x`j''"
 		local j = `j' + 1
 	}
 
-  save "${directory}/constructed/fig_4.dta", replace
+  save "${directory}/constructed/fig_2A.dta", replace
 
 // Creating data for analysis of non-trial groups/table_3
 

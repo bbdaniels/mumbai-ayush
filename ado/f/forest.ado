@@ -1,4 +1,4 @@
-*! version 2.3: 3 Feb 2020 Benjamin Daniels bbdaniels@gmail.com
+*! version 2.4: 19 May 2020 Benjamin Daniels bbdaniels@gmail.com
 
 // Forest - Stata module to visualize results from multiple regressions on a single independent variable.
 
@@ -51,6 +51,13 @@ preserve
   parenParse `anything'
   forvalues i = 1/`r(nStrings)' {
     local string`i' = "`r(string`i')'"
+
+    // Get if-condition
+    if regexm("`string`i''"," if ") {
+      local ifcond`i' = substr("`string`i''",strpos("`string`i''"," if "),.)
+      local string`i' = subinstr("`string`i''","`ifcond`i''","",.)
+    }
+
     unab string`i' : `string`i''
   }
 
@@ -88,18 +95,18 @@ forvalues i = 1/`nStrings' {
 
     // Replace any self-referenced controls here
     local theseControls = subinstr("`controls'","@","`1'",.)
-    local thisTreatment = subinstr("`treatment'","@","`1'",.)
 
 		// Regression
-		`cmd' `1' `thisTreatment' ///
+		`cmd' `1' `treatment' ///
       `theseControls' ///
+      `ifcond`i'' ///
       [`weight'`exp'] ///
       , `options' `or' `thisBonferroni'
 
     // Store results
 		mat a = r(table)'
 		mat a = a[1,....]
-    if "`bh'" != "" mat a = `i' , a
+    mat a = `i' , a
 
 		mat results = nullmat(results) ///
 			\ a
