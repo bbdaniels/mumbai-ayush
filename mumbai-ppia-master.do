@@ -1,7 +1,7 @@
 // Master file for Mumbai Public Sector analysis
 
 // Set global directory locations
-global rawdata "/Users/bbdaniels/Box/_Papers/Ruchika PPIA"
+global rawdata "/Users/RuchikaBhatia/Box Sync/Ruchika PPIA"
 global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
 
 // Install packages ------------------------------------------------------------------------------
@@ -13,11 +13,12 @@ sysdir set PLUS "${directory}/ado/"
   ssc install betterbar , replace
   ssc install randtreat , replace
   ssc install xsvmat, replace 
+  ssc install iefieldkit, replace
 
   net from "https://github.com/bbdaniels/stata/raw/master/"
     net install forest , replace
 
-  set scheme uncluttered
+ 
 
 // Globals -------------------------------------------------------------------------------------
 
