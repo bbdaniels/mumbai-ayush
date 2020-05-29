@@ -7,9 +7,11 @@
 	local quality "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 				   
 	valuelabels `quality', name(t3) columns(7) //Create Matrix
-	matrix colnames t3 = "00" "01" "10" "11" "Effect" "Std Error" "P-value"
 	
 	mat t3 = r(t3)
+	
+	matrix colnames t3 = "00" "01" "10" "11" "Effect" "Std Error" "P-value"
+	
 	
 	local row = 1
 
