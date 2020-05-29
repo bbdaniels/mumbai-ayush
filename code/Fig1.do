@@ -2,7 +2,7 @@
 	
 	// Line graph for non-trial group
 	
-	use "${directory}/constructed/table_3.dta", clear
+	use "${directory}/constructed/nontrial.dta", clear
 	
 	// 8 groups according to group and round 
 	egen check_wave = group(check wave), label 

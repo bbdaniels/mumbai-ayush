@@ -167,7 +167,7 @@ use "${directory}/constructed/analysis-trial-panel.dta", clear
   compress
 	save "${directory}/constructed/analysis-trial-wide.dta", replace // Saving data for lagged-variables analysis
 
-//Creating data for Fig_3: Case 1 + 7 sensitivity and specificity 
+//Creating data for Fig_2B: Case 1 + 7 sensitivity and specificity 
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if wave == 1 & (case == 1 | case == 7)
@@ -201,7 +201,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	save "${directory}/constructed/fig_2B.dta", replace //Saving data for fig3
 
-// Creating data for Fig_4: Case 1 sensitivity and specificity
+// Creating data for Fig_2A: Case 1 sensitivity and specificity
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if (case == 1)
@@ -234,7 +234,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
   save "${directory}/constructed/fig_2A.dta", replace
 
-// Creating data for analysis of non-trial groups/table_3
+// Creating data for analysis of non-trial groups
 
 	use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
@@ -248,9 +248,9 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	egen check = group(ppia_facility_0 ppia_facility_1), label
 
-	save "${directory}/constructed/table_3.dta", replace
+	save "${directory}/constructed/nontrial.dta", replace
 
-// Creating data for analysis of Case-7/table_4
+// Creating data for analysis of Case-7
 
 	use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
@@ -258,6 +258,6 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if case == 7
 
-	save "${directory}/constructed/table_4.dta", replace
+	save "${directory}/constructed/analysis-ayush-panel-case-7.dta", replace
 
 // End of dofile

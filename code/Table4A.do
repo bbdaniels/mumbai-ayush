@@ -1,13 +1,12 @@
 // Diff in Diff Output
 
   use "${directory}/constructed/analysis-trial-did.dta", clear
-
-  unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 ///
-				 med_l_any_2 med_l_any_3 med_k_any_9
 				 
-  local quality1 "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
+  local quality "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 
-	valuelabels `quality1', name(t2) columns(10) //Create matrix 
+	valuelabels `quality', name(t2) columns(10) //Create matrix 
+	
+	mat t2 = r(t2)
 	
     matrix colnames t2 = "Control" "Treatment" "Control" "Treatment" ///
 						 "Effect" "Std Error" "P-Value" "Effect" ///
@@ -49,7 +48,7 @@
     }
   }
 
-  putexcel set "${directory}/outputs/Table_2.xlsx", replace //Save results in excel
+  putexcel set "${directory}/outputs/Table4A_DID.xlsx", replace //Save results in excel
 
   putexcel D7=matrix(t2), names
 

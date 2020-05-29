@@ -2,15 +2,14 @@
 
 	//Outcomes for Case 7
 
-	use "${directory}/constructed/table_4.dta", clear
+	use "${directory}/constructed/analysis-ayush-panel-case-7.dta", clear
 
-	unab quality :  dr_1 dr_4 re_1 med_any med med_l_any_2 ///
-				    med_l_any_3 med_k_any_9 sp7_id_1
 					
-	local quality1 "dr_1 dr_4 re_1 med_any med med_l_any_2 med_l_any_3 med_k_any_9 sp7_id_1"
+	local quality "dr_1 dr_4 re_1 med_any med med_l_any_2 med_l_any_3 med_k_any_9 sp7_id_1"
 
-	valuelabels `quality1', name(t4) columns(8) //Create Matrix
-
+	valuelabels `quality', name(t4) columns(8) //Create Matrix
+	
+	mat t4 = r(t4)
 
 	matrix colnames t4 = "Control" "Treatment" "Effect" "Std Error" ///
 						 "P-Value" "Effect" "Std Error" "P-Value"
@@ -46,7 +45,7 @@
 		}
 	}
 
-	putexcel set "${directory}/outputs/Table_4.xlsx", replace //Save results in excel
+	putexcel set "${directory}/outputs/Table4B_Case7.xlsx", replace //Save results in excel
 
 	putexcel D5 = matrix(t4), names
 	forvalues  i = 5/7{

@@ -140,13 +140,15 @@ sysdir set PLUS "${directory}/ado/"
 
 // Part 3: Analysis ----------------------------------------------------------------------------
 
-  run "${directory}/code/AYUSH.do"
-  run "${directory}/code/Table_2.do"
-  run "${directory}/code/Table_3.do"
-  run "${directory}/code/Table_4.do"
-  run "${directory}/code/Table_5.do"
-  run "${directory}/code/Fig1_NonTrial.do"
-  run "${directory}/code/Sensitivity_and_Specificity.do"
+  run "${directory}/code/Table1B.do"
+  run "${directory}/code/Table2.do"
+  run "${directory}/code/Table3.do"
+  run "${directory}/code/Table4A.do"
+  run "${directory}/code/Table4B.do"
+  run "${directory}/code/TableA1.do"
+  run "${directory}/code/TableA2.do"
+  run "${directory}/code/Fig1.do"
+  run "${directory}/code/Fig2.do"
   
 
 // Have a lovely day!

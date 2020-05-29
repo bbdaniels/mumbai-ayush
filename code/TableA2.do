@@ -2,15 +2,14 @@
 
 	//Naive Diff in Diff on Non-Trial Groups
 
-	use "${directory}/constructed/table_3.dta", clear
-
-	unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 ///
-				   med_l_any_3 med_k_any_9
+	use "${directory}/constructed/nontrial.dta", clear
 				   
-	local quality1 "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
+	local quality "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 				   
-	valuelabels `quality1', name(t3) columns(7) //Create Matrix
+	valuelabels `quality', name(t3) columns(7) //Create Matrix
 	matrix colnames t3 = "00" "01" "10" "11" "Effect" "Std Error" "P-value"
+	
+	mat t3 = r(t3)
 	
 	local row = 1
 
@@ -43,7 +42,7 @@
 	}
 
 
-	putexcel set "${directory}/outputs/Table_3.xlsx", replace //Saving results in excel
+	putexcel set "${directory}/outputs/TableA2_NonTrial.xlsx", replace //Saving results in excel
 
 	putexcel D7 = matrix(t3), names
 	putexcel E22= "00"
