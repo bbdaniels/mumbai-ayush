@@ -102,7 +102,7 @@ sysdir set PLUS "${directory}/ado/"
 	
 	
 	foreach i in `varlist'{
-		if "`fig’" == "2A" {
+		if "`fig'" == "2A" {
 			tab `i'0 `i', matcell(`i') 
 		}
 		else if "`fig'" == "2B" {
