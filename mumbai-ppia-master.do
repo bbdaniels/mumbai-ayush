@@ -2,7 +2,7 @@
 
 // Set global directory locations
 global rawdata "/Users/RuchikaBhatia/Box Sync/Ruchika PPIA"
-global directory "/Users/RuchikaBhatia/GitHub/mumbai-ppia"
+global directory "/Users/RuchikaBhatia/GitHub/mumbai-ayush"
 
 // Install packages ------------------------------------------------------------------------------
 sysdir set PLUS "${directory}/ado/"
@@ -81,58 +81,6 @@ sysdir set PLUS "${directory}/ado/"
 	return mat `name' = t
 	end
 	
-	// Program 2 - Create sensitivity and specificity graphs 
-	capture program drop sensitivity
-	program define sensitivity 
-	
-	syntax varlist, fig(str)
-	
-	use "${directory}/constructed/fig_`fig'.dta", clear
-	
-	local nRows = 0 //Create value labels
-    foreach i in `varlist' {
-		local ++nRows
-		label define lblindicator `nRows' "`: variable label `i''", modify 
-    }
-
-    mat x = J(`nRows',3,0)
-	matrix colnames x = "Sensitivity" "Specificity" "_n"
-	
-	local row = 1 // Store sensitivity and specificity values in a matrix
-	
-	
-	foreach i in `varlist'{
-		if "`fig'" == "2A" {
-			tab `i'0 `i', matcell(`i') 
-		}
-		else if "`fig'" == "2B" {
-			tab `i'1 `i', matcell(`i')
-		}
-			mat x[`row', 1] = `i'[2,2]/(`i'[1,2]+ `i'[2,2])
-			mat x[`row', 2] = `i'[1,1]/(`i'[1,1]+ `i'[2,1])
-			mat x[`row', 3] = `row'
-			local ++row	
-
-	}
-	
-	forvalues i = 1/`nRows'{ //Rounding off values in the matrix
-		forvalues j = 1/2{
-			matrix x[`i', `j'] = round(x[`i',`j'], 0.01)
-		}
-	}
-	
-	svmat float x , names(matcol) //Create variables from matrix
-	
-	label values x_n lblindicator 
-
-	graph hbar xSensitivity xSpecificity  , ///
-		over(x_n, label(labsize(small))) blabel(bar) intensity(50) /// 
-		legend(order(1 "Sensitivity" 2 "Specificity")) legend(size(small)) ///
-		ylab(,notick nogrid) ///
-		graphregion(color(white) lwidth(large))
-		
-	graph export "${directory}/outputs/fig`fig'.eps", replace
-	end
 	
 // Part 2: Build constructed data from raw data ------------------------------------------------
 
@@ -146,9 +94,8 @@ sysdir set PLUS "${directory}/ado/"
   run "${directory}/code/Table4A.do"
   run "${directory}/code/Table4B.do"
   run "${directory}/code/TableA1.do"
-  run "${directory}/code/TableA2.do"
   run "${directory}/code/Fig1.do"
-  run "${directory}/code/Fig2.do"
+  
   
 
 // Have a lovely day!

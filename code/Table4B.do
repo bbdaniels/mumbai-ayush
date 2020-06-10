@@ -61,22 +61,22 @@
 
 	forest reg /// Graph for ITT
 	(`quality') ///
-		, t(trial_assignment) vce(cluster qutub_id) bh ///
-		graphopts(title("ITT-SP7")  ///
-		ylab(,notick nogrid) xlab(,notick nogrid) ///
-		graphregion(color(white) lwidth(large)) ///
-		xtitle("Effect of treatment")) sort(global)
+		, t(trial_assignment) vce(cluster qutub_id) bh sort(global) ///
+		graphopts($graph_opts ///
+	xtitle("Effect of PPIA program (ITT)", size(medsmall)) ///
+	xlab( -.5 "-50%" 0 "0%"  .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+
+		
 		
 		graph save "${directory}/outputs/ITT-SP7.gph", replace
 
     forest ivregress 2sls /// Graph for TOT
 	(`quality') ///
-		, t((trial_treatment = trial_assignment)) vce(cluster qutub_id) bh ///
-		graphopts(title("TOT-SP7") ///
-		ylab(,notick nogrid) xlab(,notick nogrid) ///
-		graphregion(color(white) lwidth(large)) ///
-		xtitle("Effect of treatment")) sort(global) 
-
+		, t((trial_treatment = trial_assignment)) vce(cluster qutub_id) bh sort(global) ///
+		graphopts($graph_opts ///
+	xtitle("Effect of PPIA program (TOT)", size(medsmall)) ///
+	xlab( -.5 "-50%" 0 "0%" .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+		
 		graph save "${directory}/outputs/TOT-SP7.gph", replace
 
 		graph combine ///
@@ -87,5 +87,6 @@
 			
 
 	graph export "${directory}/outputs/TOT&ITT-Case7.eps", replace
+	graph export "${directory}/outputs/TOT&ITT-Case7.png", width(1000) replace
 
 // End of dofile

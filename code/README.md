@@ -1,22 +1,26 @@
-# Placeholder file
+# Mumbai-PPIA-AYUSH
+#Replication files
 
-This file has been created automatically by the command **iegitaddmd** from the Stata package [**ietoolkit**](https://worldbank.github.io/ietoolkit) to make GitHub sync this folder. GitHub does not sync empty folders or folders that only contain ignored files, but in research projects it is often important to share the full standardized folder structure along with the actual files. This command is intended to be used with **iefolder**, but it can be used in any folder structure intended to be shared on GitHub.
+Construct.do
+It cleans the preliminary datasets and creates various datasets which are used for analysis in the other do files.
 
-In recently started projects, it is typical to create data folders, script folders (do-files, r-files) and output folders, among others. The output folders are initially empty, but the script files might include a file path to them for later use. If an output folder is empty and another collaborator clones the repository, then the output folder expected by the scripts will not be included by GitHub in the cloned repository, and the script will not run properly.
+Table1B.do
+This file creates tables reporting the number of time each case scenario was presented to each of the provider groups (control, treatment, PPIA and non-PPIA) in baseline and in endline. These tables were separately edited in google sheets to create one compact table.
 
-## You should replace the content of this placeholder file
+Table2.do
+This file runs linear regression models to estimate the differences in quality of care outcomes between endline and baseline for the Observational Cohort. These results are reported in a table.
 
-The text in this file should be replaced with text that describes the intended use of this folder. This file is written in markdown (.md) format, which is suitable for GitHub syncing (unlike .doc/.docx). If the file is named *README.md*, GitHub automatically displays its contents when someone opens the containing folder on GitHub.com using a web browser.
+Table3.do
+This file runs linear regression models to check if the control and treatment groups are statistically indistinguishable in baseline across a list of balance, process and quality of care indicators. For each family of indicators, a table and figure is generated. The 3 tables were separately edited in google sheets to create one compact table.
 
-If you are new to markup languages (markdown, html etc.) then this [Markdown Tutorial](https://www.markdowntutorial.com/) is a great place to start. If you have some experience with markup languages, then this [Markdown Cheat Sheet](https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf) is a great place to start.
+Table4A.do
+This file runs difference in differences models to estimate the effect (both ITT and TOT) of the PPIA program on quality of care indicators for the Experimental Cohort. Only TB case scenarios are included as the asthma case was not presented in baseline. Results are saved in a table and a figure.
 
-## Add similar files in other folders
+Table4B.do
+This file runs a linear regression to estimate the effect(both ITT and TOT) of the PPIA program on quality of care indicators of the asthma case for the Experimental Cohort. Results are saved in a table and a figure.
 
-The Stata command **iegitaddmd** does not add anything to folders that already have content unless this is explicitly requested using the option `all`. It is best practice to create a *README.md* file in any folders that have content, for example, in folders whose purpose might not obvious to someone using the repository for the first time. Again, if the file is named *README.md*, then the content of the file will be shown in the browser when someone explores the repository on GitHub.com.
+Fig1.do
+This file creates a figure that compares the mean of correct management, referral and chest x-ray for the 4 groups of the Observational Cohort (remained out of PPIA, exited PPIA in endline, entered PPIA in baseline, remained in PPIA) across baseline and endline.
 
-Another great use of a *README.md* file is to use it as a documentation on how the folder it sits in and its subfolders are organized,  where its content can be found, and where new content is meant to be saved. For example, if you have a folder called `/Baseline/`, then you can give a short description of the activities conducted during the baseline and where data, scripts and outputs related to it can be found.
-
-## Removing this file
-
-Removing this file is not recommended, as GitHub may stop syncing the parent folder unless the folder now has other content. However, even when content is added and the file can be removed without breaking the GitHub functionality, our recommendation is to replace the content with more relevant content rather than deleting it.
-
+TableA1.do
+This file creates tables that report the number of providers within each group that belong to one of the 4 groups for each case scenario: presented the case in both the rounds, presented the case only in baseline, presented the case only in endline, not presented the case in either of the rounds. These tables were separately edited in google sheets to create one compact table.

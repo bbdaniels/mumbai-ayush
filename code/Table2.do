@@ -2,7 +2,6 @@
 	//Time trend in the non-trial group
 	
 	use "${directory}/constructed/nontrial.dta", clear
-	
 			   
 	local quality "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 

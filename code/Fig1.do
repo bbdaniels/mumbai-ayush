@@ -53,7 +53,7 @@
 			3 "Exited the program in endline" ///
 			4 "Remained in the program") region(lcolor(white))) ///
 			xlabel(1 2, valuelabel) ylabel(,angle(0)) legend(size(vsmall)) ///
-			ylab(,notick nogrid) ///
+			ylab(0.1 "10%" 0.2 "20%" 0.3 "30%" ,notick nogrid) ///
 		graphregion(color(white) lwidth(large))
 			
 			graph save "${directory}/outputs/`i'.gph", replace
@@ -69,6 +69,6 @@
 	graphregion(color(white))
 	
 	
-	graph export "${directory}/outputs/fig1_nontrial.eps", replace 
+	graph export "${directory}/outputs/fig1_nontrial.eps",  replace 
 	
-	
+	//End of do file 

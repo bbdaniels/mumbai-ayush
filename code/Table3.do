@@ -33,13 +33,18 @@
 	foreach i in Balance Process Quality {
 		forest reg ///
 		(``i'' ) ///
-		, t(trial_assignment)  controls(i.case) vce(cluster qutub_id) ///
-		graphopts(xtitle("") ylab(,notick nogrid labsize(vsmall)) ///
-		title("{bf:`i' Indicators}", position(11) size(small)) ///
-		xlab(, labsize(vsmall)) graphregion(color(white) lwidth(large)) ///
-		xtit("{&larr} Favors Control    Favors Treated {&rarr}",size(vsmall))) 
+		, t(trial_assignment)  controls(i.case) bh vce(cluster qutub_id) ///
+			graphopts(title(, justification(left) color(black) pos(11)) ///
+  	graphregion(color(white) lc(white) lw(med)) bgcolor(white) ///
+  	ylab(,angle(0) nogrid) ytit(,placement(left) justification(left))  ///
+  	yscale(noline) legend(region(lc(none) fc(none))) ///
+			xtit("{&larr} Favors Control   Favors Treated {&rarr}", size(small)) ///
+			xlab(-.25 "-25%" -.5 "-50%" 0 "0%" .25 "25%" .5 "50%"  , labsize(small)) ///
+			ylab(,labsize(small))  ///
+			title("{bf:`i' Indicators}", color(black) size(small)))
 
 			graph save "${directory}/outputs/`i'.gph", replace 
+			graph export "${directory}/outputs/`i'.png", width(1000) replace
 	}
 	
 	graph combine ///

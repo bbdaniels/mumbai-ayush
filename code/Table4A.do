@@ -1,13 +1,13 @@
 // Diff in Diff Output
 
   use "${directory}/constructed/analysis-trial-did.dta", clear
-				 
+
   local quality "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 
-	valuelabels `quality', name(t2) columns(10) //Create matrix 
-	
+	valuelabels `quality', name(t2) columns(10) //Create matrix
+
 	mat t2 = r(t2)
-	
+
     matrix colnames t2 = "Control" "Treatment" "Control" "Treatment" ///
 						 "Effect" "Std Error" "P-Value" "Effect" ///
 						 "Std Error" "P-Value"
@@ -41,7 +41,7 @@
   }
 
   local nRows `= rowsof(t2)'
-  
+
   forvalues i = 1/`nRows'{ //Round off values
     forvalues j = 1/10 {
       matrix t2[`i', `j'] = round(t2[`i',`j'], 0.001)
@@ -70,11 +70,9 @@
   (`quality') ///
     , t((d_totXpost d_tot  = d_treat d_treatXpost)) controls(i.case d_post) ///
     vce(cluster qutub_id) bh sort(global) ///
-	graphopts(title("Diff in Diff : TOT") ///
-	ylab(,notick nogrid) xlab(,notick nogrid) ///
-	xtitle("Effect of treatment") ///
-	graphregion(color(white) lwidth(large)))
-
+	graphopts($graph_opts ///
+	xtitle("Effect of PPIA program (TOT)", size(medsmall)) ///
+	xlab(-.5 "-50%" 0 "0%"  .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
     graph save "${directory}/outputs/Diff_in_Diff_TOT.gph", replace //Saving
 
 
@@ -83,51 +81,21 @@
   (`quality') ///
     , t(d_treatXpost) controls(d_treat d_post i.case) ///
     vce(cluster qutub_id) bh sort(global) ///
-	graphopts(title("Diff in Diff : ITT") ///
-	ylab(,notick nogrid) xlab(,notick nogrid) ///
-	xtitle("Effect of treatment") ///
-	graphregion(color(white) lwidth(large)))
-		
+	graphopts($graph_opts ///
+	xtitle("Effect of PPIA program (ITT)", size(medsmall)) ///
+	xlab( -.5 "-50%" 0 "0%"  .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+
     graph save "${directory}/outputs/Diff_in_Diff_ITT.gph", replace //Saving
-
-
-  // ANCOVA ITT AND TOT
-
-  use "${directory}/constructed/analysis-trial-wide.dta", clear
-
-  unab quality : correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_2 ///
-           med_l_any_3 med_k_any_9
-
-
-  forest reg /// Graph for ITT usig ANCOVA
-  (`quality') ///
-    , t(trial_assignment) controls(i.case @0) ///
-    vce(cluster qutub_id) bh sort(global) ///
-	graphopts(title("ANCOVA : ITT") ///
-	ylab(,notick nogrid) xlab(,notick nogrid) ///
-	xtitle("Effect of treatment") ///
-	graphregion(color(white) lwidth(large)))
-
-    graph save "${directory}/outputs/ANCOVA_ITT.gph", replace
-
-    forest ivregress 2sls /// Graph for TOT using ANCOVA
-  (`quality') ///
-    , t((trial_treatment = trial_assignment)) controls(i.case @0) ///
-    vce(cluster qutub_id) bh sort(global) ///
-	graphopts(title("ANCOVA : TOT") ///
-	ylab(,notick nogrid) xlab(,notick nogrid) ///
-	xtitle("Effect of treatment") ///
-	graphregion(color(white) lwidth(large)))
-
-    graph save "${directory}/outputs/ANCOVA_TOT.gph", replace //Saving
+	graph export "${directory}/outputs/Diff_in_Diff_ITT.png", width(1000) replace //Saving
+	
 
     graph combine ///
       "${directory}/outputs/Diff_in_Diff_ITT.gph" ///
       "${directory}/outputs/Diff_in_Diff_TOT.gph" ///
-      "${directory}/outputs/ANCOVA_ITT.gph" ///
-      "${directory}/outputs/ANCOVA_TOT.gph", xcommon ysize(6) altshrink ///
-	  graphregion(color(white) lwidth(large))
+      , xcommon ysize(3) altshrink ///
+	     graphregion(color(white) lc(white) lw(med)) 
 
-    graph export "${directory}/outputs/DID_ANCOVA_Combine.eps", replace
+    graph export "${directory}/outputs/DID_Combine.eps", replace
+	graph export "${directory}/outputs/DID_Combine.png", width(1000) replace
 
 // End of dofile
