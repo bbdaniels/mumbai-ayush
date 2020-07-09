@@ -3,6 +3,8 @@
   use "${directory}/constructed/analysis-trial-did.dta", clear
 
   local quality "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
+  
+  local quality2 "correct dr_1 dr_4 re_1 re_3 re_4 med_any med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 
 	valuelabels `quality', name(t2) columns(10) //Create matrix
 
@@ -67,23 +69,23 @@
   putexcel E4:M4 = "Effect of PPIA on quality indicators using Difference in Difference", merge hcenter font(calibri,14) bold underline
 
   forest ivregress 2sls /// Graph for Diff in Diff TOT
-  (`quality') ///
+  (`quality2') ///
     , t((d_totXpost d_tot  = d_treat d_treatXpost)) controls(i.case d_post) ///
     vce(cluster qutub_id) bh sort(global) ///
 	graphopts($graph_opts ///
 	xtitle("Effect of PPIA program (TOT)", size(medsmall)) ///
-	xlab(-.5 "-50%" 0 "0%"  .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall))) 
     graph save "${directory}/outputs/Diff_in_Diff_TOT.gph", replace //Saving
 
 
 
   forest reg /// Graph for Diff in Diff ITT
-  (`quality') ///
+  (`quality2') ///
     , t(d_treatXpost) controls(d_treat d_post i.case) ///
     vce(cluster qutub_id) bh sort(global) ///
 	graphopts($graph_opts ///
 	xtitle("Effect of PPIA program (ITT)", size(medsmall)) ///
-	xlab( -.5 "-50%" 0 "0%"  .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall))) 
 
     graph save "${directory}/outputs/Diff_in_Diff_ITT.gph", replace //Saving
 	graph export "${directory}/outputs/Diff_in_Diff_ITT.png", width(1000) replace //Saving

@@ -6,6 +6,8 @@
 
 					
 	local quality "dr_1 dr_4 re_1 med_any med med_l_any_2 med_l_any_3 med_k_any_9 sp7_id_1"
+	
+	local quality2 "dr_1 dr_4 re_1 med_any med_l_any_2 med_l_any_3 med_k_any_9 sp7_id_1"
 
 	valuelabels `quality', name(t4) columns(8) //Create Matrix
 	
@@ -60,22 +62,22 @@
 
 
 	forest reg /// Graph for ITT
-	(`quality') ///
+	(`quality2') ///
 		, t(trial_assignment) vce(cluster qutub_id) bh sort(global) ///
 		graphopts($graph_opts ///
 	xtitle("Effect of PPIA program (ITT)", size(medsmall)) ///
-	xlab( -.5 "-50%" 0 "0%"  .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+	xlab( -.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall))) 
 
 		
 		
 		graph save "${directory}/outputs/ITT-SP7.gph", replace
 
     forest ivregress 2sls /// Graph for TOT
-	(`quality') ///
+	(`quality2') ///
 		, t((trial_treatment = trial_assignment)) vce(cluster qutub_id) bh sort(global) ///
 		graphopts($graph_opts ///
 	xtitle("Effect of PPIA program (TOT)", size(medsmall)) ///
-	xlab( -.5 "-50%" 0 "0%" .5 "50%"  1 "100%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+	xlab( -.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall))) 
 		
 		graph save "${directory}/outputs/TOT-SP7.gph", replace
 
