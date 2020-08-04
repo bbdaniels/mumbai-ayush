@@ -5,7 +5,7 @@
 
 	tostring form dr_5b_no re_1_a med_h_1 med_j_2 cp_13 med_f_2 med_f_3 re_*_c re_2_c re_11_a re_12_*_* cp_12 cp_12_3 re_4_a, force replace
 
-	
+
 	save "${directory}/constructed/sp-wave-0.dta" , replace
 
 // Cleanup: Wave 1 -----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 	replace re_1 = 1 if re_1 > 1
 
 	rename g* g_*
-	
+
 	replace dr_4 = 0 if dr_4 == 3
 
 	save "${directory}/constructed/sp-wave-1.dta" , replace
@@ -81,7 +81,11 @@
     lab val cp_17_? yesno
 
   // Label cleaning
-	label variable correct "Correct Management"
+	label variable correct "Correct"
+	label variable med_l_any_1 "TB Treatment"
+
+  lab def wave 0 "Baseline" 1 "Endline" , modify
+
 
 // Save -------------------------------------------------------------------------------
   compress
@@ -99,7 +103,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep qutub_id qutub_sample_updated trial_treatment trial_assignment case wave `quality'
 	keep if qutub_sample_updated == 10 | qutub_sample_updated == 11
-	drop if case == 7
+	// drop if case == 7
 
 	save "${directory}/constructed/analysis-trial-panel.dta", replace
 
@@ -167,7 +171,7 @@ use "${directory}/constructed/analysis-trial-panel.dta", clear
   compress
 	save "${directory}/constructed/analysis-trial-wide.dta", replace // Saving data for lagged-variables analysis
 
-//Creating data for Fig_2B: Case 1 + 7 sensitivity and specificity 
+//Creating data for Fig_2B: Case 1 + 7 sensitivity and specificity
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	keep if wave == 1 & (case == 1 | case == 7)
@@ -189,10 +193,10 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 	unab quality7: correct7 dr_17 dr_47 re_17 re_37 re_47 med_any7 med7 med_l_any_17 med_l_any_27 ///
 				   med_l_any_37 med_k_any_97
-				   
+
 
 	rename (`quality7') (`quality')
-	
+
 	local j = 1 //Provide value labels
 	foreach i in `quality' {
 		label variable `i' "`x`j''"

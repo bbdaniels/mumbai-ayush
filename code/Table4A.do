@@ -3,7 +3,7 @@
   use "${directory}/constructed/analysis-trial-did.dta", clear
 
   local quality "correct dr_1 dr_4 re_1 re_3 re_4 med_any med med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
-  
+
   local quality2 "correct dr_1 dr_4 re_1 re_3 re_4 med_any med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9"
 
 	valuelabels `quality', name(t2) columns(10) //Create matrix
@@ -74,7 +74,7 @@
     vce(cluster qutub_id) bh sort(global) ///
 	graphopts($graph_opts ///
 	xtitle("Effect of PPIA program (TOT)", size(medsmall)) ///
-	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall)))
     graph save "${directory}/outputs/Diff_in_Diff_TOT.gph", replace //Saving
 
 
@@ -85,17 +85,17 @@
     vce(cluster qutub_id) bh sort(global) ///
 	graphopts($graph_opts ///
 	xtitle("Effect of PPIA program (ITT)", size(medsmall)) ///
-	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall))) 
+	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall)))
 
     graph save "${directory}/outputs/Diff_in_Diff_ITT.gph", replace //Saving
 	graph export "${directory}/outputs/Diff_in_Diff_ITT.png", width(1000) replace //Saving
-	
+
 
     graph combine ///
       "${directory}/outputs/Diff_in_Diff_ITT.gph" ///
       "${directory}/outputs/Diff_in_Diff_TOT.gph" ///
       , xcommon ysize(3) altshrink ///
-	     graphregion(color(white) lc(white) lw(med)) 
+	     graphregion(color(white) lc(white) lw(med))
 
     graph export "${directory}/outputs/DID_Combine.eps", replace
 	graph export "${directory}/outputs/DID_Combine.png", width(1000) replace

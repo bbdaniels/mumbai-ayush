@@ -1,24 +1,28 @@
 // Master file for Mumbai Public Sector analysis
 
 // Set global directory locations
-global rawdata "/Users/RuchikaBhatia/Box/Ruchika PPIA"
-global directory "/Users/RuchikaBhatia/GitHub/mumbai-ayush"
+global rawdata "/Users/bbdaniels/Box/_Papers/Ruchika PPIA"
+global directory "/Users/bbdaniels/GitHub/mumbai-ayush"
 
 // Install packages ------------------------------------------------------------------------------
 sysdir set PLUS "${directory}/ado/"
+sysdir set PERSONAL "${directory}/"
+
+  set scheme uncluttered
 
   net install "http://www.stata.com/users/kcrow/tab2xl", replace
   ssc install tabcount , replace
+  ssc install tabout , replace
   ssc install ietoolkit , replace
   ssc install betterbar , replace
   ssc install randtreat , replace
-  ssc install xsvmat, replace 
+  ssc install xsvmat, replace
   ssc install iefieldkit, replace
 
   net from "https://github.com/bbdaniels/stata/raw/master/"
     net install forest , replace
 
- 
+
 
 // Globals -------------------------------------------------------------------------------------
 
@@ -64,12 +68,12 @@ sysdir set PLUS "${directory}/ado/"
      using "${directory}/data/sp-wave-1.dta" ///
      , replace copy hash text
 
-// Programs 
+// Programs
 	// Program 1- Create a matrix with rownames
 	capture program drop valuelabels
 	program define valuelabels, rclass
-	
-	syntax varlist, name(str) columns(int) 
+
+	syntax varlist, name(str) columns(int)
 	local tRows = 0
     foreach i in `varlist' {
       local thisLabel: variable label `i'
@@ -80,8 +84,8 @@ sysdir set PLUS "${directory}/ado/"
     matrix rownames t = `rowNames'
 	return mat `name' = t
 	end
-	
-	
+
+
 // Part 2: Build constructed data from raw data ------------------------------------------------
 
   run "${directory}/code/construct.do"
@@ -95,7 +99,7 @@ sysdir set PLUS "${directory}/ado/"
   run "${directory}/code/Table4B.do"
   run "${directory}/code/TableA1.do"
   run "${directory}/code/Fig1.do"
-  
-  
+
+
 
 // Have a lovely day!
