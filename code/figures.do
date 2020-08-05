@@ -15,13 +15,13 @@ use "${directory}/constructed/nontrial.dta", clear
       qui margins check#wave
 
     marginsplot , ${graph_opts} legend(on) title("Panel `i': `title'" , justification(left) color(black) span pos(11)) ///
-      plot1opts(lc(gray) mc(gray) lw(none) mlc(black) msize(*3)) ci1opts(lc(gray) ) ///
+      plot1opts(lc(gray) mc(white) lw(none) mlc(gray) msize(*3)) ci1opts(lc(gray) ) ///
       plot2opts(lc(black) mc(black) lw(none) mlc(black) msize(*3)) ci2opts(lc(black)) ///
       ylab(0 "0%" 0.1 "10%" 0.2 "20%" 0.3 "30%" ,notick nogrid) ///
       ytit("") xtit("") xoverhang ///
       xscale(noline) yline(0 , lc(gray)) ///
       xlab(1 "Never PPIA" 2 "PPIA Endline Only" 3 "PPIA Baseline Only" 4 "Always PPIA")
-      
+
     graph save "${directory}/outputs/`var'.gph", replace
 
   }
