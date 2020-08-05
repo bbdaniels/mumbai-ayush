@@ -4,6 +4,7 @@
 
 // Figure 2. Baseline-endline changes for Observational Cohort
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
+  keep if case < 7
 
   local x = 0
   foreach var of varlist correct dr_4 re_1 re_3 {
