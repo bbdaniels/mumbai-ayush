@@ -3,7 +3,7 @@
 // Figure 1. CONSORT diagram for Experimental Cohort
 
 // Figure 2. Baseline-endline changes for Observational Cohort
-use "${directory}/constructed/nontrial.dta", clear
+use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
   local x = 0
   foreach var of varlist correct dr_4 re_1 re_3 {
@@ -11,16 +11,15 @@ use "${directory}/constructed/nontrial.dta", clear
     local i : word `x' of `c(ALPHA)'
 
     local title : var label `var'
-    qui reg `var' i.check##i.wave i.case , cl(qutub_id)
-      qui margins check#wave
+    qui reg `var' i.group##i.wave i.case , cl(qutub_id)
+      qui margins group#wave
 
     marginsplot , ${graph_opts} legend(on) title("Panel `i': `title'" , justification(left) color(black) span pos(11)) ///
       plot1opts(lc(gray) mc(white) lw(none) mlc(gray) msize(*3)) ci1opts(lc(gray) ) ///
       plot2opts(lc(black) mc(black) lw(none) mlc(black) msize(*3)) ci2opts(lc(black)) ///
       xlab(0 "0%" 0.1 "10%" 0.2 "20%" 0.3 "30%" ,notick nogrid) ///
       ytit("") xtit("") xoverhang horiz ///
-      yscale(noline) xscale(noline) xline(0 , lc(gray)) ///
-      ylab(1 "Never PPIA" 2 "PPIA Endline Only" 3 "PPIA Baseline Only" 4 "Always PPIA")
+      yscale(noline reverse) xscale(noline) xline(0 , lc(gray))
 
     graph save "${directory}/outputs/`var'.gph", replace
 

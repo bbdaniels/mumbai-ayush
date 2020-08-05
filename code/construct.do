@@ -86,6 +86,27 @@ use "${directory}/constructed/sp-wave-0.dta"
 
     lab def wave 0 "Baseline" 1 "Endline" , modify
 
+    gen group = .
+      replace group = 1 if trial_treatment == 1
+      replace group = 2 if trial_treatment == 0
+      replace group = 3 if trial_treatment == . ///
+        & ppia_facility_0 == 1 & ppia_facility_1 == 1
+      replace group = 4 if trial_treatment == . ///
+        & ppia_facility_0 == 0 & ppia_facility_1 == 0
+      replace group = 5 if trial_treatment == . ///
+        & ppia_facility_0 == 0 & ppia_facility_1 == 1
+      replace group = 6 if trial_treatment == . ///
+        & ppia_facility_0 == 1 & ppia_facility_1 == 0
+
+      lab def group ///
+        1 "Assigned to Treatment" ///
+        2 "Assigned to Control" ///
+        3 "Non-Trial Always PPIA" ///
+        4 "Non-Trial Never PPIA" ///
+        5 "Non-Trial Joined PPIA" ///
+        6 "Non-Trial Exited PPIA"
+      lab val group group
+
   // Save
   compress
 	save "${directory}/constructed/analysis-ayush-panel.dta" , replace
