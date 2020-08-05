@@ -12,7 +12,8 @@ use "${directory}/constructed/nontrial.dta", clear
   rctreg ///
     correct dr_1 dr_4 re_1 re_3 re_4 med_any med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9 ///
     using "${directory}/outputs/tab-2.xlsx" ///
-  , treatment(wave) controls(i.case i.check) sd p round(0.001) cl(qutub_id)
+  , treatment(wave) controls(i.case i.check) ///
+    sd p format(%-9.3f) cl(qutub_id)
 
 // Table 3. Baseline balance for Experimental Cohort
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
@@ -31,7 +32,8 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
   rctreg ///
     `balance' `quality' `process' ///
     using "${directory}/outputs/tab-3.xlsx" ///
-  , treatment(trial_assignment) controls(i.case) sd p round(0.001) cl(qutub_id)
+  , treatment(trial_assignment) controls(i.case) ///
+    sd p format(%-9.3f) cl(qutub_id)
 
 // Table 4. Difference-in-differences PPIA impact estimates
 use "${directory}/constructed/analysis-trial-did.dta", clear
@@ -40,7 +42,7 @@ use "${directory}/constructed/analysis-trial-did.dta", clear
      correct dr_1 dr_4 re_1 re_3 re_4 ///
        med_any med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9 ///
      using "${directory}/outputs/tab-4.xlsx" ///
-   , treatment(d_treatXpost) controls(i.trial_assignment i.case i.wave) sd p round(0.001) cl(qutub_id) ///
-     iv(d_totXpost)
+   , treatment(d_treatXpost) controls(i.trial_assignment i.case i.wave) ///
+     sd p format(%-9.3f) cl(qutub_id) iv(d_totXpost)
 
 // End of do-file

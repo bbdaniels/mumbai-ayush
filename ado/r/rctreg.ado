@@ -3,7 +3,10 @@
 cap prog drop rctreg
 prog def rctreg
 
-syntax varlist using [if/] [in], controls(string asis) treatment(varlist) [sd] [title(string asis)] [round(real 0.01)] [lag] [iv(string asis)] [p] [se] [ci] *
+syntax varlist using [if/] [in] ///
+, controls(string asis) Treatment(varlist) ///
+  [sd] [title(string asis)] [format(string asis)] ///
+  [lag] [iv(string asis)] [p] [se] [ci] *
 
 version 13
 * Options
@@ -12,6 +15,8 @@ version 13
 	local treatvar : word 1 of `treatment'
 	local morevars = regexr("`treatment'","`treatvar'","")
 	local treatment `treatvar'
+
+  if "`format'" == "" local format "%-3.2f"
 
 	* IV
 
@@ -113,24 +118,27 @@ qui foreach var of varlist `varlist' {
 	local theLabel : var label `var'
 
 	sum `var' if `treatment'==0 `ifcond' `ifand' `if' `in'
-		local control_mean = string(round((1/`round')*`r(mean)',1)*`round')
-		local control_sd = string(round((1/`round')*`r(sd)',1)*`round')
+		local control_mean : di `format' `r(mean)'
+		local control_sd : di `format' `r(sd)'
+      local control_sd = trim("`control_sd'")
 		local control_n = `r(N)'
 	sum `var' if `treatment'==1 `ifcond' `ifand' `if' `in'
-		local treatment_mean = string(round((1/`round')*`r(mean)',1)*`round')
-		local treatment_sd = string(round((1/`round')*`r(sd)',1)*`round')
+		local treatment_mean : di `format' `r(mean)'
+		local treatment_sd : di `format' `r(sd)'
+      local treatment_sd = trim("`treatment_sd'")
 		local treatment_n = `r(N)'
 
 	reg `var' `treatment' `morevars' `ifif' `if' `in', `options'
 
 		mat regdata = r(table)
 
-		local point_estimate = string(round((1/`round')*_b[`treatment'],1)*`round')
-		local lower_limit = string(round((1/`round')*regdata[5,1],1)*`round')
-		local upper_limit = string(round((1/`round')*regdata[6,1],1)*`round')
+		local point_estimate : di `format' _b[`treatment']
+      local point_estimate = trim("`point_estimate'")
+		local lower_limit : di `format' regdata[5,1]
+		local upper_limit : di `format' regdata[6,1]
 		local p_stat = regdata[4,1]
-			local itt_p = string(round((1/`round')*regdata[4,1],1)*`round')
-			local itt_se = string(round((1/`round')*_se[`treatment'],1)*`round')
+			local itt_p : di `format' regdata[4,1]
+			local itt_se : di `format' _se[`treatment']
 			local stars = 0
 			local theStars ""
 			if `p_stat' < 0.1  local stars = 1
@@ -153,12 +161,13 @@ qui foreach var of varlist `varlist' {
 
 			mat regdata = r(table)
 
-			local point_estimate = string(round((1/`round')*_b[`iv'],1)*`round')
-			local lower_limit = string(round((1/`round')*regdata[5,1],1)*`round')
-			local upper_limit = string(round((1/`round')*regdata[6,1],1)*`round')
+			local point_estimate : di `format' _b[`iv']
+        local point_estimate = trim("`point_estimate'")
+			local lower_limit : di `format' regdata[5,1]
+			local upper_limit : di `format' regdata[6,1]
 			local p_stat = regdata[4,1]
-				local iv_p = string(round((1/`round')*regdata[4,1],1)*`round')
-				local iv_se = string(round((1/`round')*_se[`iv'],1)*`round')
+				local iv_p : di `format' regdata[4,1]
+				local iv_se : di `format' _se[`iv']
 				local stars = 0
 				local theStars ""
 				if `p_stat' < 0.1  local stars = 1
@@ -180,12 +189,13 @@ qui foreach var of varlist `varlist' {
 
 		mat regdata = r(table)
 
-		local point_estimate = string(round((1/`round')*_b[`treatment'],1)*`round')
-		local lower_limit = string(round((1/`round')*regdata[5,1],1)*`round')
-		local upper_limit = string(round((1/`round')*regdata[6,1],1)*`round')
+		local point_estimate : di `format' _b[`treatment']
+      local point_estimate = trim("`point_estimate'")
+		local lower_limit : di `format' regdata[5,1]
+		local upper_limit : di `format' regdata[6,1]
 		local p_stat = regdata[4,1]
-			local itt_ad_p = string(round((1/`round')*regdata[4,1],1)*`round')
-			local itt_ad_se = string(round((1/`round')*_se[`treatment'],1)*`round')
+			local itt_ad_p : di `format' regdata[4,1]
+			local itt_ad_se : di `format' _se[`treatment']
 			local stars = 0
 			local theStars ""
 			if `p_stat' < 0.1  local stars = 1
@@ -208,12 +218,13 @@ qui foreach var of varlist `varlist' {
 
 			mat regdata = r(table)
 
-			local point_estimate = string(round((1/`round')*_b[`iv'],1)*`round')
-			local lower_limit = string(round((1/`round')*regdata[5,1],1)*`round')
-			local upper_limit = string(round((1/`round')*regdata[6,1],1)*`round')
+			local point_estimate : di `format' _b[`iv']
+        local point_estimate = trim("`point_estimate'")
+			local lower_limit : di `format' regdata[5,1]
+			local upper_limit : di `format' regdata[6,1]
 			local p_stat = regdata[4,1]
-				local iv_ad_p = string(round((1/`round')*regdata[4,1],1)*`round')
-				local iv_ad_se = string(round((1/`round')*_se[`iv'],1)*`round')
+				local iv_ad_p : di `format' regdata[4,1]
+				local iv_ad_se : di `format' _se[`iv']
 				local stars = 0
 				local theStars ""
 				if `p_stat' < 0.1  local stars = 1
