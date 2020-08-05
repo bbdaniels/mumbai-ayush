@@ -17,10 +17,10 @@ use "${directory}/constructed/nontrial.dta", clear
     marginsplot , ${graph_opts} legend(on) title("Panel `i': `title'" , justification(left) color(black) span pos(11)) ///
       plot1opts(lc(gray) mc(white) lw(none) mlc(gray) msize(*3)) ci1opts(lc(gray) ) ///
       plot2opts(lc(black) mc(black) lw(none) mlc(black) msize(*3)) ci2opts(lc(black)) ///
-      ylab(0 "0%" 0.1 "10%" 0.2 "20%" 0.3 "30%" ,notick nogrid) ///
-      ytit("") xtit("") xoverhang ///
-      xscale(noline) yline(0 , lc(gray)) ///
-      xlab(1 "Never PPIA" 2 "PPIA Endline Only" 3 "PPIA Baseline Only" 4 "Always PPIA")
+      xlab(0 "0%" 0.1 "10%" 0.2 "20%" 0.3 "30%" ,notick nogrid) ///
+      ytit("") xtit("") xoverhang horiz ///
+      yscale(noline) xscale(noline) xline(0 , lc(gray)) ///
+      ylab(1 "Never PPIA" 2 "PPIA Endline Only" 3 "PPIA Baseline Only" 4 "Always PPIA")
 
     graph save "${directory}/outputs/`var'.gph", replace
 
@@ -58,7 +58,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
       bh vce(cluster qutub_id) ///
 	  graphopts($graph_opts ysize(5) ///
 			xtit("{&larr} Favors Control   Favors Treated {&rarr}", size(small)) ///
-			xlab(-.2 "-20%" -0.1 "-10%" 0 "0%" 0.1 "10%" .2 "20%"   , labsize(small)) ///
+			xlab(-.2 "-20%" -0.1 "-10%" 0 "0%" 0.1 "+10%" .2 "+20%"   , labsize(small)) ///
 			ylab(,labsize(small)) )
 
 			graph export "${directory}/outputs/fig-3.eps", replace
@@ -77,7 +77,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
         vce(cluster qutub_id) bh ///
     graphopts($graph_opts title("Panel A: Tuberculosis ITT") ///
     	xtitle("Effect of PPIA program", size(medsmall)) ///
-    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall)))
+    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
 
       graph save "${directory}/outputs/fig-4a.gph", replace
 
@@ -88,7 +88,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
         vce(cluster qutub_id) bh  ///
     graphopts($graph_opts title("Panel B: Tuberculosis TOT") ///
     	xtitle("Effect of PPIA program", size(medsmall)) ///
-    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall)))
+    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
 
       graph save "${directory}/outputs/fig-4b.gph", replace
 
@@ -104,7 +104,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
         vce(cluster qutub_id) bh ///
     graphopts($graph_opts title("Panel C: Asthma ITT") ///
     	xtitle("Effect of PPIA program", size(medsmall)) ///
-    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall)))
+    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
 
       graph save "${directory}/outputs/fig-4c.gph", replace
 
@@ -115,7 +115,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
         vce(cluster qutub_id) bh  ///
     graphopts($graph_opts title("Panel D: Asthma TOT") ///
     	xtitle("Effect of PPIA program", size(medsmall)) ///
-    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "20%" 0.4 "40%", labsize(medsmall)) ylab(,labsize(medsmall)))
+    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
 
       graph save "${directory}/outputs/fig-4d.gph", replace
 
