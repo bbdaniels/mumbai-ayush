@@ -80,7 +80,7 @@ version 13
 	if "`if'" != "" local ifif if
 
 	foreach var in `morevars' `controls' {
-		local ifcond `" `ifcond' & `var' < . "'
+		local ifcond `" `ifcond' & `=subinstr("`var'","i.","",.)' < . "'
 		}
 
 	* Lag control
@@ -92,14 +92,14 @@ version 13
 * Set up spreadsheet header
 
 if "`ci'" == "" {
-	putexcel 	A1=(`title') ///
+	putexcel 	A1=("`title'") ///
 				A2=("Statistic") B2=("Control Group") D2=("Intervention Group") F2=("ITT Unadjusted") G2=("ITT Adjusted") ///
 				B3=("N") C3=("Mean") D3=("N") E3=("Mean") F3=("Difference") G3=("Difference") ///
 				`ivhead' ///
 				`using', replace
 	}
 if "`ci'" != "" {
-	putexcel 	A1=(`title') ///
+	putexcel 	A1=("`title'") ///
 				A2=("Statistic") B2=("Control Group") D2=("Intervention Group") F2=("ITT Unadjusted") H2=("ITT Adjusted") ///
 				B3=("N") C3=("Mean") D3=("N") E3=("Mean") F3=("Difference") G3=("95% CI") H3=("Difference") I3=("95% CI") ///
 				`ivhead' ///
