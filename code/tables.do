@@ -38,12 +38,33 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
 // Table 4. Difference-in-differences PPIA impact estimates
 use "${directory}/constructed/analysis-trial-did.dta", clear
+  keep if case < 7
 
-   rctreg ///
-     correct dr_1 dr_4 re_1 re_3 re_4 ///
-     med_any med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9 ///
-   using "${directory}/outputs/tab-4.xlsx" ///
-   , treatment(d_treatXpost) controls(i.trial_assignment i.case i.wave) ///
-     sd p format(%-9.3f) cl(qutub_id) iv(d_totXpost)
+  local vars correct dr_1 dr_4 re_1 re_3 re_4 ///
+    med_any med_l_any_1 med_l_any_2 med_l_any_3 med_k_any_9
+
+  rctreg ///
+    `vars' ///
+  using "${directory}/outputs/tab-4a.xlsx" ///
+  , treatment(d_treatXpost) controls(i.trial_assignment i.case i.wave) ///
+    sd ci p format(%-9.3f) cl(qutub_id) iv(d_totXpost)
+
+  sumstats ///
+    (`vars' if trial_assignment == 0 & wave == 0) ///
+    (`vars' if trial_assignment == 1 & wave == 0) ///
+    (`vars' if trial_assignment == 0 & wave == 1) ///
+    (`vars' if trial_assignment == 1 & wave == 1) ///
+  using "${directory}/outputs/tab-4b.xlsx" ///
+  , stats(mean sem) replace
+
+use "${directory}/constructed/analysis-trial-did.dta", clear
+  keep if case == 7
+
+  rctreg ///
+    dr_1 dr_4 re_1 ///
+    med_any med_l_any_2 med_l_any_3 med_k_any_9 ///
+  using "${directory}/outputs/tab-4c.xlsx" ///
+  , treatment(trial_assignment) controls(i.case) ///
+    sd p ci format(%-9.3f) cl(qutub_id) iv(trial_treatment)
 
 // End of do-file
