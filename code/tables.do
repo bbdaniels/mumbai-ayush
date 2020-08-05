@@ -1,6 +1,6 @@
 // Tables
 
-// Table 1B. Case interactions for the 4 provider samples by round
+// Table 1. Case interactions for the 4 provider samples by round
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
 
   egen type = group(wave qutub_sample_updated) , label

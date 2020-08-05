@@ -1,6 +1,16 @@
 // Figures.
 
 // Figure 1. CONSORT diagram for Experimental Cohort
+use "${directory}/constructed/analysis-ayush-panel.dta", clear
+  egen ptag = tag(qutub_id)
+  bys qutub_id: egen minwave = min(wave)
+  bys qutub_id: egen maxwave = max(wave)
+
+  ta ptag
+  ta ptag trial_assignment , m
+  ta trial_assignment trial_treatment if ptag
+  ta trial_assignment minwave if ptag
+  ta trial_assignment maxwave if ptag
 
 // Figure 2. Baseline-endline changes for Observational Cohort
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
@@ -12,15 +22,12 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
     local i : word `x' of `c(ALPHA)'
 
     local title : var label `var'
-    qui reg `var' i.group##i.wave i.case , cl(qutub_id)
-      qui margins group#wave
 
-    marginsplot , ${graph_opts} legend(on) title("Panel `i': `title'" , justification(left) color(black) span pos(11)) ///
-      plot1opts(lc(gray) mc(white) lw(none) mlc(gray) msize(*3)) ci1opts(lc(gray) ) ///
-      plot2opts(lc(black) mc(black) lw(none) mlc(black) msize(*3)) ci2opts(lc(black)) ///
-      xlab(0 "0%" 0.1 "10%" 0.2 "20%" 0.3 "30%" ,notick nogrid) ///
-      ytit("") xtit("") xoverhang horiz ///
-      yscale(noline reverse) xscale(noline) xline(0 , lc(gray))
+    betterbar `var' , over(wave) by(group) barlab pct ci ///
+      ${graph_opts} title("Panel `i': `title'") ///
+      barcolor(black gray) ///
+      legend(on) xoverhang yscale(noline) ///
+      xlab(0 "0%" 0.1 "10%" 0.2 "20%" 0.3 "30%" .4 "40%")
 
     graph save "${directory}/outputs/`var'.gph", replace
 
