@@ -15,6 +15,10 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 // Figure 2. Baseline-endline changes for Observational Cohort
 use "${directory}/constructed/analysis-ayush-panel.dta", clear
   keep if case < 7
+	
+	expand 2 , gen(all)
+	  replace group = 0 if all == 1
+		lab def group 0 "Pooled" , add
 
   local x = 0
   foreach var of varlist correct dr_4 re_1 re_3 {
@@ -22,10 +26,12 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
     local i : word `x' of `c(ALPHA)'
 
     local title : var label `var'
+		
+	  lab var `var' ""
 
     betterbar `var' , over(wave) by(group) barlab pct ci ///
       ${graph_opts} title("Panel `i': `title'") ///
-      barcolor(black gray) ///
+      barcolor(gs12 gs8) ///
       legend(on) xoverhang yscale(noline) ///
       xlab(0 "0%" 0.1 "10%" 0.2 "20%" 0.3 "30%" .4 "40%")
 
@@ -41,8 +47,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
   ,	legendfrom("${directory}/outputs/correct.gph") c(2) altshrink xcom ycom ///
   	graphregion(color(white))
 
-    graph save  "${directory}/outputs/fig-2.gph" , replace
-    graph combine  "${directory}/outputs/fig-2.gph" , ysize(5)
+    graph draw, ysize(5)
     graph export  "${directory}/outputs/fig-2.eps" , replace
 
 // Figure 3. Baseline balance for Experimental Cohort
@@ -53,6 +58,8 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 	foreach var of varlist g_6-g_10 {
 		recode `var' (1 2 = 0)(3 = 1)
 	}
+	
+	lab var correct "Correct Management"
 
 	unab balance : cp_17_* cp_18 cp_21
 	unab process : g_1 g_2 g_3 g_4 g_5 g_6 g_7 g_8 g_9 g_10
@@ -60,13 +67,13 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
 				   med_l_any_3 med_k_any_9
 
 	forest reg ///
-		(`balance')(`quality')(`process') ///
+		(`balance' `quality' `process') ///
 		, t(trial_assignment)  controls(i.case) ///
-      bh vce(cluster qutub_id) ///
+      vce(cluster qutub_id) ///
 	  graphopts($graph_opts ysize(5) ///
 			xtit("{&larr} Favors Control   Favors Treated {&rarr}", size(small)) ///
 			xlab(-.2 "-20%" -0.1 "-10%" 0 "0%" 0.1 "+10%" .2 "+20%"   , labsize(small)) ///
-			ylab(,labsize(small)) )
+			ylab(,labsize(small)) ) sort(global) mde
 
 			graph export "${directory}/outputs/fig-3.eps", replace
 
@@ -81,10 +88,10 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
     forest reg ///
       (`quality') ///
         , t(d_treatXpost) controls(i.case d_post) ///
-        vce(cluster qutub_id) bh ///
-    graphopts($graph_opts title("Panel A: Tuberculosis ITT") ///
-    	xtitle("Effect of PPIA program", size(medsmall)) ///
-    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
+        vce(cluster qutub_id) mde sort(global) ///
+    graphopts($graph_opts title("Panel A: Tuberculosis (ITT)") ///
+    	xtitle("Effect of randomization to PPIA program offer", size(medsmall)) ///
+      xlab(-0.15 "-15%" -0.1 "-10%" -0.05 "-5%"  0 "0%"  0.05 "+5%" 0.1 "+10%" 0.15 "+15%", labsize(medsmall)) ylab(,labsize(medsmall)))
 
       graph save "${directory}/outputs/fig-4a.gph", replace
 
@@ -92,7 +99,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
     forest ivregress 2sls ///
       (`quality') ///
         , t((d_totXpost d_tot  = d_treat d_treatXpost)) controls(i.case d_post) ///
-        vce(cluster qutub_id) bh  ///
+        vce(cluster qutub_id) mde  ///
     graphopts($graph_opts title("Panel B: Tuberculosis TOT") ///
     	xtitle("Effect of PPIA program", size(medsmall)) ///
     	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
@@ -108,10 +115,10 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
     forest reg ///
       (`quality') ///
         , t(d_treatXpost) controls(d_post) ///
-        vce(cluster qutub_id) bh ///
-    graphopts($graph_opts title("Panel C: Asthma ITT") ///
-    	xtitle("Effect of PPIA program", size(medsmall)) ///
-    	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
+        vce(cluster qutub_id) mde sort(global)  ///
+    graphopts($graph_opts title("Panel B: Asthma (ITT)") ///
+    	xtitle("Effect of randomization to PPIA program offer", size(medsmall)) ///
+      xlab(-0.15 "-15%" -0.1 "-10%" -0.05 "-5%"  0 "0%"  0.05 "+5%" 0.1 "+10%" 0.15 "+15%", labsize(medsmall)) ylab(,labsize(medsmall)))
 
       graph save "${directory}/outputs/fig-4c.gph", replace
 
@@ -119,7 +126,7 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
     forest ivregress 2sls ///
       (`quality') ///
         , t((d_totXpost d_tot  = d_treat d_treatXpost)) controls(d_post) ///
-        vce(cluster qutub_id) bh  ///
+        vce(cluster qutub_id) mde  ///
     graphopts($graph_opts title("Panel D: Asthma TOT") ///
     	xtitle("Effect of PPIA program", size(medsmall)) ///
     	xlab(-.40 "-40%" -0.2 "-20%" 0 "0%"  0.2 "+20%" 0.4 "+40%", labsize(medsmall)) ylab(,labsize(medsmall)))
@@ -129,13 +136,10 @@ use "${directory}/constructed/analysis-ayush-panel.dta", clear
   // Combine
   graph combine ///
     "${directory}/outputs/fig-4a.gph" ///
-    "${directory}/outputs/fig-4b.gph" ///
     "${directory}/outputs/fig-4c.gph" ///
-    "${directory}/outputs/fig-4d.gph" ///
-  , c(2) xcom
+  , c(1) xcom altshrink
 
-    graph save  "${directory}/outputs/fig-4.gph" , replace
-    graph combine  "${directory}/outputs/fig-4.gph" , ysize(5)
+    graph draw, ysize(6)
     graph export "${directory}/outputs/fig-4.eps", replace
 
 // End of do-file

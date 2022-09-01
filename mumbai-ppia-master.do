@@ -1,7 +1,7 @@
 // Master file for Mumbai Public Sector analysis
 
 // Set global directory locations
-global rawdata "/Users/bbdaniels/Box/_Papers/Ruchika PPIA"
+global rawdata "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/PPIA AYUSH"
 global directory "/Users/bbdaniels/GitHub/mumbai-ayush"
 
 // Install packages ------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ sysdir set PERSONAL "${directory}/"
   ssc install xsvmat, replace
   ssc install iefieldkit, replace
 
-  net from "https://github.com/bbdaniels/stata/raw/master/"
+  net from "https://github.com/bbdaniels/stata/raw/main/"
     net install forest , replace
 
 
@@ -92,13 +92,8 @@ sysdir set PERSONAL "${directory}/"
 
 // Part 3: Analysis ----------------------------------------------------------------------------
 
-  run "${directory}/code/Table1B.do"
-  run "${directory}/code/Table2.do"
-  run "${directory}/code/Table3.do"
-  run "${directory}/code/Table4A.do"
-  run "${directory}/code/Table4B.do"
-  run "${directory}/code/TableA1.do"
-  run "${directory}/code/Fig1.do"
+  run "${directory}/code/figures.do
+  run "${directory}/code/tables.do
 
 
 
