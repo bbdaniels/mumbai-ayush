@@ -11,9 +11,12 @@ use "${box}/Master_Code_File.dta" , clear
     using "${git}/data/codefile.xlsx" ///
     , save sign reset replace
 
-// SP data
+// Ayush SP data
 use "${box}/sp-wave-0.dta" , clear
+  ren g_* g*
 append using "${box}/sp-wave-1.dta" , gen(round) force
+  recode g* (1/2=0)(3/max=1)
+
 
   replace round = round + 1
   lab def round 1 "Round 1" 2 "Round 2"
@@ -28,9 +31,27 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   drop *given
 
   iecodebook export ///
-    using "${git}/data/sp-data.xlsx" ///
+    using "${git}/data/sp-ayush.xlsx" ///
     , save sign reset replace
 
 
+// Public sector SP data
+use "https://github.com/bbdaniels/mumbai-public/raw/main/constructed/sp-data.dta" , clear
+
+  ren qutub_id fid
+  unab vars :  *
+
+  append using "${git}/data/sp-ayush.dta" , gen(a)
+    drop if (case == 2 | case == 3 | case == 7) & a == 1
+    replace case = 2 if case == 4 & a == 1
+    drop a
+
+  keep `vars'
+  replace type = 0 if type == .
+    lab def type 0 "AYUSH" , modify
+
+  iecodebook export ///
+    using "${git}/data/sp-pubpri.xlsx" ///
+    , save sign reset replace
 
 // End
