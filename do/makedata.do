@@ -21,6 +21,7 @@ use "${box}/sp-wave-0.dta" , clear
 append using "${box}/sp-wave-1.dta" , gen(round) force
   recode g1-g10 (1/2=0)(3/max=1)
 
+  replace ppia_facility_1 = 1 if ppia_facility_0 == 1
 
   replace round = round + 1
   lab def round 1 "Round 1" 2 "Round 2"
