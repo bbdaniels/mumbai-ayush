@@ -424,43 +424,43 @@ local variables ///
       , replace col(`labels')
 
   // Results table: DID
-    estimates clear
-    local labels ""
-    use "${git}/data/ayush-cross-section.dta" if case == 7, clear
+  estimates clear
+  local labels ""
+  use "${git}/data/ayush-cross-section.dta" if case == 7, clear
 
-      gen lag = .
-        lab var lag "Lagged Outcome"
+    gen lag = .
+      lab var lag "Lagged Outcome"
 
-      qui foreach var of varlist `variables' {
-        replace lag = `var'_bl
-        reg `var' ppia_facility_1 lag i.case , vce(cluster fidcode)
+    qui foreach var of varlist `variables' {
+      replace lag = `var'_bl
+      reg `var' ppia_facility_1 lag i.case , vce(cluster fidcode)
 
-        est sto `var'
-        local labels `"`labels' "`:var label `var''" "'
-      }
+      est sto `var'
+      local labels `"`labels' "`:var label `var''" "'
+    }
 
-      outwrite `variables' ///
-        using "${git}/outputs/t6-cs-reg-did.xlsx" ///
-        , replace col(`labels') stats(N r2)
+    outwrite `variables' ///
+      using "${git}/outputs/t6-cs-reg-did.xlsx" ///
+      , replace col(`labels') stats(N r2)
 
-      clear
-        tempfile x
-        save `x' , emptyok
+    clear
+      tempfile x
+      save `x' , emptyok
 
-      qui foreach var in `variables' {
-        use "${git}/data/ayush-cross-section.dta" if case == 7, clear
-        keep `var' ppia_facility_1 ppia_trial case fidcode `var'_bl
-          ren `var'_bl lag
-          append using `x'
-          save `x' , replace
-      }
+    qui foreach var in `variables' {
+      use "${git}/data/ayush-cross-section.dta" if case == 7, clear
+      keep `var' ppia_facility_1 ppia_trial case fidcode `var'_bl
+        ren `var'_bl lag
+        append using `x'
+        save `x' , replace
+    }
 
-      rwolf `variables' ///
-        , method(regress) ///
-          indepvar(ppia_facility_1) controls(lag  i.case) ///
-          vce(cluster fidcode) cluster(fidcode)
+    rwolf `variables' ///
+      , method(regress) ///
+        indepvar(ppia_facility_1) controls(lag  i.case) ///
+        vce(cluster fidcode) cluster(fidcode)
 
-        mat result = e(RW)'
-        outwrite result using "${git}/outputs/t6-cs-reg-did-rw.xlsx" ///
-        , replace col(`labels')
+      mat result = e(RW)'
+      outwrite result using "${git}/outputs/t6-cs-reg-did-rw.xlsx" ///
+      , replace col(`labels')
 // End
