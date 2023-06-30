@@ -19,7 +19,7 @@ use "${box}/Master_Code_File.dta" , clear
 use "${box}/sp-wave-0.dta" , clear
   ren g_* g*
 append using "${box}/sp-wave-1.dta" , gen(round) force
-  recode g1-g10 (1/2=0)(3/max=1)
+  recode g6-g10 (1/2=0)(3/max=1)
 
   replace ppia_facility_1 = 1 if ppia_facility_0 == 1
 

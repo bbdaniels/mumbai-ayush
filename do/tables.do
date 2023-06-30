@@ -44,7 +44,7 @@ use "${git}/data/sp-ayush.dta" , clear
     graph export "${git}/outputs/meds-2.png" , width(3000) replace
 
 // Medicine level
-use "${git}/data/sp-ayush.dta" , clear
+use "${git}/data/sp-ayush.dta" if round == 1, clear
 
   keep med_k_* med_l_* case
 
