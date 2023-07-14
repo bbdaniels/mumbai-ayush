@@ -61,7 +61,7 @@ use "${git}/data/sp-ayush.dta" if round == 1, clear
   replace type = 50 if type == 0
 
 // Table: Baseline balance
-use "${git}/data/sp-ayush.dta" if round == 1 , clear
+use "${git}/data/ayush-baseline.dta", clear
 
 local variables ///
   correct index_good dr_4 re_1 re_3 re_4  ///

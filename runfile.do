@@ -1,7 +1,7 @@
 // Master file for Mumbai AYUSH analysis
 
 // Setup
-
+global aux "/Users/bbdaniels/Library/CloudStorage/Box-Box/Qutub/MUMBAI/"
 global box "/Users/bbdaniels/Library/CloudStorage/Box-Box/Qutub/MUMBAI/constructed"
 global git "/Users/bbdaniels/GitHub/mumbai-ayush"
 ieboilstart, v(16.1) adopath("${git}/ado" , strict)

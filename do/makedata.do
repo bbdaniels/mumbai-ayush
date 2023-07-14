@@ -3,6 +3,28 @@
 // PPIA data
 use "/Users/bbdaniels/Library/CloudStorage/Box-Box/SP Raw/Mumbai/clean/mumbai-ppia.dta" , clear
 
+// Baseline unlabelled medications
+
+import excel using "${aux}/data/raw/wave-0/Med Cleaning/Unlabelled_Entry.Devinder.xlsx" , clear first
+  drop in 1/2
+
+  tempfile unlab
+  save `unlab' , replace
+
+import excel using "${aux}/data/raw/wave-0/Med Cleaning/Unlabelled_Entry.Purshottam.xlsx" , clear first
+  drop in 1/2
+  append using `unlab'
+
+  drop if form == ""
+  keep form med_k_
+  bys form: gen med = _n
+  destring med_k_ , replace
+  reshape wide med_k_ , i(form) j(med)
+
+  egen med_unl_anti = anymatch(med_k_?) , v(6)
+  egen med_unl_ster = anymatch(med_k_?) , v(9)
+
+  save `unlab' , replace
 
 // Codefile
 use "${box}/Master_Code_File.dta" , clear
@@ -30,7 +52,7 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   ren qutub_id fid
   drop qutub*
 
-  merge m:1 fid using "${git}/data/ppia-codefile.dta" , keep(3)
+  merge m:1 fid using "${git}/data/ppia-codefile.dta" , keep(3) nogen
   replace dr_4 = 0 if dr_4 == 3
 
   drop *given
@@ -60,6 +82,8 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   gen ttreat_tot = ppia_facility_1*r2
     lab var ttreat_tot "DID Interaction (TOT)"
 
+  drop *unlab*
+
   iecodebook export ///
     using "${git}/data/sp-ayush.xlsx" ///
     , save sign reset replace
@@ -67,6 +91,12 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   // Baseline balance
   preserve
   keep if round == 1
+    merge 1:1 form using `unlab' , keep(1 3) nogen
+    replace med_unl_anti = 0 if med_unl_anti == .
+      lab var med_unl_anti "Unlabelled Antibiotic"
+    replace med_unl_ster = 0 if med_unl_ster == .
+      lab var med_unl_ster "Unlabelled Steroid"
+
   save "${git}/data/ayush-baseline.dta", replace
 
   collapse (mean) ///
