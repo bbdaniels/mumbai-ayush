@@ -44,15 +44,19 @@ use "${git}/data/sp-ayush.dta" , clear
     graph export "${git}/outputs/meds-2.png" , width(3000) replace
 
 // Medicine level
-use "${git}/data/sp-ayush.dta" if round == 1, clear
+/*
+use "${git}/data/sp-ayush.dta" if round == 2, clear
+  merge 1:1 form using "/Users/bbdaniels/Library/CloudStorage/Box-Box/Qutub/MUMBAI/data/public/Wave-1/sp1_4.dta" ///
+    , keepusing(med_b2*) update replace keep(1 3 4 5) nogen
 
-  keep med_k_* med_l_* case
+  keep med_k_* med_l_* case med_b2* ppia_trial
 
   gen uid = _n
 
-  reshape long med_k_ med_l_ , i(uid) j(med)
+  reshape long med_k_ med_l_ med_b2_ , i(uid) j(med)
     ren med_k_ type
     ren med_l_ anti
+    ren med_b2_ desc
 
     replace anti = 3 if type == 6 & anti == .
 
@@ -60,6 +64,41 @@ use "${git}/data/sp-ayush.dta" if round == 1, clear
   drop if type == .
   replace type = 50 if type == 0
 
+  keep if ppia_trial < .
+  keep if type == 1
+
+  preserve
+    keep desc
+    ren desc desc2
+    tempfile blank
+    save `blank'
+  restore
+    cross using `blank'
+    strdist desc desc2
+
+  cap prog drop rstringer
+  prog def rstringer , rclass
+  preserve
+    bsample
+    su strdist
+    return scalar mean = r(mean)
+  restore
+  end
+
+  simulate m = r(mean) ///
+    , reps(100) : rstringer
+
+  preserve
+  keep if ppia_trial == 0
+    keep desc
+    ren desc desc2
+    tempfile treat
+    save `treat'
+  restore
+  keep if ppia_trial == 1
+  cross using `treat'
+  strdist desc desc2
+*/
 // Table: Baseline balance
 use "${git}/data/ayush-baseline.dta", clear
 
