@@ -1,15 +1,23 @@
-// Get raw data from box
-
-// PPIA data
-// use "/Users/bbdaniels/Library/CloudStorage/Box-Box/SP Raw/Mumbai/clean/mumbai-ppia.dta" , clear
+// Construct release ready data
 
 // Ayush SP data
 use "${box}/sp-wave-0.dta" , clear
-  ren g_* g*
-append using "${box}/sp-wave-1.dta" , gen(round) force
-  recode g6-g10 (1/2=0)(3/max=1)
+    ren g_* g*
+  append using "${box}/sp-wave-1.dta" , gen(round) force
+    recode g6-g10 (1/2=0)(3/max=1)
 
   replace ppia_facility_1 = 1 if ppia_facility_0 == 1
+
+  lab var med_k_any_12 "Psychiatric"
+  lab var med_k_any_8 "Anti-Ulcer"
+  lab var med_k_any_10 "Anti-Allergy"
+  lab var med_k_any_13 "Other Type"
+  lab var med_k_any_16 "Cough Syrup"
+  lab var med_k_any_2 "Injectable"
+  lab var med_l_any_1 "Anti-TB"
+  lab var med_k_any_11 "Cardiac"
+  lab var med_k_any_5 "Homeopathic"
+  lab var med_k_any_4 "Ayurvedic"
 
   replace round = round + 1
   lab def round 1 "Round 1" 2 "Round 2"
@@ -18,7 +26,7 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   ren qutub_id fid
   drop qutub*
 
-  merge m:1 fid using "${git}/data/ppia-codefile.dta" , keep(3) nogen
+  merge m:1 fid using "${git}/data/codefile.dta" , keep(3) nogen
   replace dr_4 = 0 if dr_4 == 3
 
   drop *given
@@ -30,7 +38,7 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   predict index_sub
     lab var index_sub "Non-Medical Quality Index"
 
-  pca med_l_any_3 med_l_any_2 med_k_any_9
+  pca med_k_any_? med_k_any_?? med_l_any_?
   predict index_bad
     lab var index_bad "Unnecessary Medications Index"
 
@@ -50,49 +58,83 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
 
   drop *unlab*
 
+  // Save two-period data
   iecodebook export ///
-    using "${git}/data/sp-ayush.xlsx" ///
+    using "${git}/data/ayush-long.xlsx" ///
     , save sign reset replace
 
-  // Baseline balance
+  // Save baseline data
   preserve
-  keep if round == 1
-    merge 1:1 form using "${git}/data/baseline-unlab.dta" , keep(1 3) nogen
-    replace med_unl_anti = 0 if med_unl_anti == .
-      lab var med_unl_anti "Unlabelled Antibiotic"
-    replace med_unl_ster = 0 if med_unl_ster == .
-      lab var med_unl_ster "Unlabelled Steroid"
+    keep if round == 1
+      merge 1:1 form using "${git}/data/baseline-unlab.dta" , keep(1 3) nogen
+      replace med_unl_anti = 0 if med_unl_anti == .
+        lab var med_unl_anti "Unlabelled Antibiotic"
+      replace med_unl_ster = 0 if med_unl_ster == .
+        lab var med_unl_ster "Unlabelled Steroid"
 
-  save "${git}/data/ayush-baseline.dta", replace
+      gen any_steroid = (med_unl_ster == 1 | med_k_any_9 == 1)
+        lab var any_steroid "Any Steroid"
+        lab var med_k_any_9 "Labeled Steroid"
+      gen any_antibio = (med_unl_anti == 1 | med_k_any_6 == 1)
+        lab var any_antibio "Any Antibiotic"
+        lab var med_k_any_6 "Labeled Antibiotic"
+        lab var med_l_any_3 "Broad-Spectrum Antibiotic"
+        lab var med_k_any_13 "Other Type"
+      gen any_antister = (any_steroid == 1 | any_antibio == 1)
+        lab var any_antister "Any Antibiotic or Steroid"
 
-  collapse (mean) ///
-    correct index_good dr_4 re_1 re_3   ///
-    index_bad med_l_any_3 med_l_any_2 med_k_any_9 ///
-    checklist time p index_sub g11 ///
-    , by(fidcode) fast
+    order * , seq
+    save "${git}/data/ayush-baseline.dta", replace
 
-    ren * *_bl
-    ren fidcode_bl fidcode
+    // Create wide version
+    labelcollapse (mean) ///
+      correct index_good dr_4 re_1 re_3   ///
+      index_bad  ///
+      checklist time p index_sub g11 ///
+      med_unl_anti med_unl_ster ///
+      med_k_any_? med_k_any_?? med_l_any_? ///
+      , by(fidcode) fast
 
-    tempfile baseline
-      save `baseline' , replace
+      ren * *_bl
+      ren fidcode_bl fidcode
 
+      tempfile baseline
+        save `baseline' , replace
   restore
 
-  // Baseline controls
+  // Save endline data
   keep if round == 2
-  merge m:1 fidcode using `baseline' , keep(1 3) nogen
-  merge 1:1 form using "${git}/data/endline-unlab.dta" , nogen
-  save "${git}/data/ayush-cross-section.dta", replace
+    merge 1:1 form using "/Users/bbdaniels/Library/CloudStorage/Box-Box/Qutub/MUMBAI/data/public/Wave-1/sp1_4.dta" ///
+      , keepusing(med_b2*) update replace keep(1 3 4 5) nogen
 
+    merge m:1 fidcode using `baseline' , keep(1 3) nogen
+    merge 1:1 form using "${git}/data/endline-unlab.dta" , nogen
+      replace med_unl_anti = 0 if med_unl_anti == .
+        lab var med_unl_anti "Unlabelled Antibiotic"
+      replace med_unl_ster = 0 if med_unl_ster == .
+        lab var med_unl_ster "Unlabelled Steroid"
 
-// Public sector SP data
+    gen any_steroid = (med_unl_ster == 1 | med_k_any_9 == 1)
+      lab var any_steroid "Any Steroid"
+      lab var med_k_any_9 "Labeled Steroid"
+    gen any_antibio = (med_unl_anti == 1 | med_k_any_6 == 1)
+      lab var any_antibio "Any Antibiotic"
+      lab var med_k_any_6 "Labeled Antibiotic"
+      lab var med_l_any_3 "Broad-Spectrum Antibiotic"
+      lab var med_k_any_13 "Other Type"
+    gen any_antister = (any_steroid == 1 | any_antibio == 1)
+      lab var any_antister "Any Antibiotic or Steroid"
+
+  order * , seq
+  save "${git}/data/ayush-endline.dta", replace
+
+// Public sector and hospital data
 use "https://github.com/bbdaniels/mumbai-public/raw/main/constructed/sp-data.dta" , clear
 
   ren qutub_id fid
   unab vars :  *
 
-  append using "${git}/data/sp-ayush.dta" , gen(a)
+  append using "${git}/data/ayush-endline.dta" , gen(a)
     drop if (case == 2 | case == 3 | case == 7) & a == 1
     replace case = 2 if case == 4 & a == 1
     drop a
@@ -101,17 +143,16 @@ use "https://github.com/bbdaniels/mumbai-public/raw/main/constructed/sp-data.dta
   replace type = 0 if type == .
     lab def type 0 "AYUSH" , modify
 
-
   egen fidcode = group(fid)
     lab var fidcode "Provider Code"
 
   pca g1-g10
   predict index_sub
-    lab var index_sub "Non-Medical Quality Index"
+    lab var index_sub "Non-Medical Index"
 
-  pca med_l_any_3 med_l_any_2 med_k_any_9
+  pca med_k_any_? med_l_any_?
   predict index_bad
-    lab var index_bad "Unnecessary Medications Index"
+    lab var index_bad "Medications Index"
 
   pca re_1 re_3 re_4
   predict index_good
@@ -120,5 +161,4 @@ use "https://github.com/bbdaniels/mumbai-public/raw/main/constructed/sp-data.dta
   iecodebook export ///
     using "${git}/data/sp-pubpri.xlsx" ///
     , save sign reset replace
-
 // End
