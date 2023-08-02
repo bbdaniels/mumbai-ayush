@@ -8,6 +8,7 @@ use "${box}/sp-wave-0.dta" , clear
 
   replace ppia_facility_1 = 1 if ppia_facility_0 == 1
 
+  lab var med_k_any_1 "Unlabelled"
   lab var med_k_any_12 "Psychiatric"
   lab var med_k_any_8 "Anti-Ulcer"
   lab var med_k_any_10 "Anti-Allergy"

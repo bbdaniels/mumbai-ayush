@@ -9,7 +9,7 @@ use "${git}/data/ayush-baseline.dta" , clear
     (any_steroid med_unl_ster med_k_any_9  ) ///
     , t(ppia_trial) c(i.case) bh  ///
       graph(xtit("Balance of Treatment Assignment") title("Baseline Balance") ///
-            xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%"))
+            xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%") xoverhang)
 
     graph save "${git}/outputs/lasso-baseline-antister.gph" , replace
 
@@ -19,7 +19,7 @@ use "${git}/data/ayush-baseline.dta" , clear
      med_k_any_15 med_k_any_16 med_k_any_17 med_k_any_50) ///
      , t(ppia_trial) c(i.case) bh ///
        graph(xtit("Balance of Treatment Assignment") title("Baseline Balance") ///
-             xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%"))
+             xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%") xoverhang)
 
     graph save "${git}/outputs/lasso-baseline-othermeds.gph" , replace
 
@@ -31,7 +31,7 @@ use "${git}/data/ayush-endline.dta" , clear
     (any_steroid med_unl_ster med_k_any_9  ) ///
     , t((ppia_trial)) c(i.case *bl) bh ///
       graph(xtit("ITT Effect of Treatment Assignment") title("Endline LASSO") ///
-            xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%"))
+            xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%") xoverhang)
 
     graph save "${git}/outputs/lasso-endline-antister.gph" , replace
 
@@ -41,16 +41,16 @@ use "${git}/data/ayush-endline.dta" , clear
      med_k_any_15 med_k_any_16 med_k_any_17 med_k_any_50) ///
      , t((ppia_trial)) c(i.case *bl) bh ///
        graph( xtit("ITT Effect of Treatment Assignment") title("Endline LASSO") ///
-             xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%"))
+             xlab(-0.1 "-10%" -0.05 "-5%" 0 "Zero" 0.05 "+5%" .1 "+10%") xoverhang)
 
     graph save "${git}/outputs/lasso-endline-othermeds.gph" , replace
 
     graph combine ///
-    "${git}/outputs/lasso-baseline-antister.gph" ///
     "${git}/outputs/lasso-baseline-othermeds.gph" ///
-    "${git}/outputs/lasso-endline-antister.gph" ///
+    "${git}/outputs/lasso-baseline-antister.gph" ///
     "${git}/outputs/lasso-endline-othermeds.gph" ///
-    , altshrink
+    "${git}/outputs/lasso-endline-antister.gph" ///
+    , altshrink ycom
 
     graph export "${git}/outputs/lasso-meds.pdf" , replace
 
