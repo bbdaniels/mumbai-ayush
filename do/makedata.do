@@ -1,41 +1,7 @@
 // Get raw data from box
 
 // PPIA data
-use "/Users/bbdaniels/Library/CloudStorage/Box-Box/SP Raw/Mumbai/clean/mumbai-ppia.dta" , clear
-
-// Baseline unlabelled medications
-
-import excel using "${aux}/data/raw/wave-0/Med Cleaning/Unlabelled_Entry.Devinder.xlsx" , clear first
-  drop in 1/2
-
-  tempfile unlab
-  save `unlab' , replace
-
-import excel using "${aux}/data/raw/wave-0/Med Cleaning/Unlabelled_Entry.Purshottam.xlsx" , clear first
-  drop in 1/2
-  append using `unlab'
-
-  drop if form == ""
-  keep form med_k_
-  bys form: gen med = _n
-  destring med_k_ , replace
-  reshape wide med_k_ , i(form) j(med)
-
-  egen med_unl_anti = anymatch(med_k_?) , v(6)
-  egen med_unl_ster = anymatch(med_k_?) , v(9)
-
-  save `unlab' , replace
-
-// Codefile
-use "${box}/Master_Code_File.dta" , clear
-  keep if qutub_sample > 6
-
-  keep qutub_id qutub_sample ppia_facility_0 ppia_facility_1 uatbc_facilitycode trial_assignment
-  ren qutub_id fid
-
-  iecodebook export ///
-    using "${git}/data/codefile.xlsx" ///
-    , save sign reset replace
+// use "/Users/bbdaniels/Library/CloudStorage/Box-Box/SP Raw/Mumbai/clean/mumbai-ppia.dta" , clear
 
 // Ayush SP data
 use "${box}/sp-wave-0.dta" , clear
@@ -91,7 +57,7 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   // Baseline balance
   preserve
   keep if round == 1
-    merge 1:1 form using `unlab' , keep(1 3) nogen
+    merge 1:1 form using "${git}/data/baseline-unlab.dta" , keep(1 3) nogen
     replace med_unl_anti = 0 if med_unl_anti == .
       lab var med_unl_anti "Unlabelled Antibiotic"
     replace med_unl_ster = 0 if med_unl_ster == .
@@ -116,6 +82,7 @@ append using "${box}/sp-wave-1.dta" , gen(round) force
   // Baseline controls
   keep if round == 2
   merge m:1 fidcode using `baseline' , keep(1 3) nogen
+  merge 1:1 form using "${git}/data/endline-unlab.dta" , nogen
   save "${git}/data/ayush-cross-section.dta", replace
 
 
