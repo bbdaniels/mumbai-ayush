@@ -19,6 +19,10 @@ use "${box}/sp-wave-0.dta" , clear
   lab var med_k_any_11 "Cardiac"
   lab var med_k_any_5 "Homeopathic"
   lab var med_k_any_4 "Ayurvedic"
+  lab var correct "Correct"
+  lab var dr_4 "Referral"
+  lab var time "Duration (Mins)"
+  lab var g11 "SP Provider Rating"
 
   replace round = round + 1
   lab def round 1 "Round 1" 2 "Round 2"
@@ -37,18 +41,10 @@ use "${box}/sp-wave-0.dta" , clear
 
   pca g1-g10
   predict index_sub
-    lab var index_sub "Non-Medical Quality Index"
-
-  pca med_k_any_? med_k_any_?? med_l_any_?
-  predict index_bad
-    lab var index_bad "Unnecessary Medications Index"
+    label var index_sub "Non-Medical"
 
   lab var trial_assignment "Assigned Treatment"
   clonevar ppia_trial = trial_assignment
-
-  pca re_1 re_3 re_4
-  predict index_good
-    lab var index_good "TB Testing Index"
 
   gen r2 = round == 2
     lab var r2 "Round 2"
@@ -58,6 +54,9 @@ use "${box}/sp-wave-0.dta" , clear
     lab var ttreat_tot "DID Interaction (TOT)"
 
   drop *unlab*
+
+  isid round form, sort
+  duplicates drop round fidcode case, force
 
   // Save two-period data
   iecodebook export ///
@@ -89,10 +88,10 @@ use "${box}/sp-wave-0.dta" , clear
 
     // Create wide version
     labelcollapse (mean) ///
-      correct index_good dr_4 re_1 re_3   ///
-      index_bad  ///
+      correct dr_4 re_1 re_3   ///
       checklist time p index_sub g11 ///
       med_unl_anti med_unl_ster ///
+      any_antister any_antibio any_steroid ///
       med_k_any_? med_k_any_?? med_l_any_? ///
       , by(fidcode) fast
 
@@ -135,7 +134,7 @@ use "https://github.com/bbdaniels/mumbai-public/raw/main/constructed/sp-data.dta
   ren qutub_id fid
   unab vars :  *
 
-  append using "${git}/data/ayush-endline.dta" , gen(a)
+  append using "${git}/data/ayush-long.dta" , gen(a)
     drop if (case == 2 | case == 3 | case == 7) & a == 1
     replace case = 2 if case == 4 & a == 1
     drop a

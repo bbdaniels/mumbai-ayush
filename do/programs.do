@@ -1,3 +1,172 @@
+// Regression setup
+cap prog drop ayushreg
+prog def ayushreg
+syntax anything using
+
+  // Baseline regression
+  use "${git}/data/ayush-baseline.dta" if ppia_trial != . & case < 7, clear
+
+  pca `anything'
+  predict index
+    lab var index "PCA"
+    clonevar index_bl = index
+
+  preserve
+    collapse (mean) index_bl , by(fidcode)
+    tempfile index
+    save `index'
+  restore
+
+  qui foreach var of varlist index `anything' {
+    reg `var' ppia_trial i.case , vce(cluster fidcode)
+      est sto `var'
+    local labels `"`labels' "`:var label `var''" "'
+  }
+
+  prestack `anything' ///
+  , gen(medtype) cl(cluster) sd(sd)
+
+  reg medtype ppia_trial i.case  i.cluster [pweight = 1/sd] ///
+    , vce(cluster fidcode)
+
+    est sto aes
+
+  preserve
+    ren medtype medtype_bl
+    collapse (mean) medtype_bl , by(fidcode cluster)
+    tempfile aes
+    save `aes'
+  restore
+
+  outwrite aes index `anything' ///
+    `using' ///
+    , replace col("AES" `labels') stats(N r2) sheet("Baseline") drop(i.cluster)
+
+  // Results table: ITT
+  estimates clear
+  local labels ""
+  use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
+
+    pca `anything'
+    predict index
+      lab var index "PCA"
+
+    qui foreach var of varlist index `anything' {
+      reg `var' ppia_trial i.case , vce(cluster fidcode)
+
+      est sto `var'
+      local labels `"`labels' "`:var label `var''" "'
+    }
+
+  prestack `anything' ///
+  , gen(medtype) cl(cluster) sd(sd)
+
+  reg medtype ppia_trial i.case i.cluster [pweight = 1/sd] ///
+    , vce(cluster fidcode)
+
+  est sto aes
+
+  outwrite aes index `anything' ///
+    `using' ///
+    , modify col("AES" `labels') stats(N r2) sheet("ITT") drop(i.cluster)
+
+  // Results table: TOT
+  estimates clear
+  local labels ""
+  use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
+
+    pca `anything'
+    predict index
+      lab var index "PCA"
+
+    qui foreach var of varlist index `anything' {
+      ivregress 2sls `var' ///
+        (ppia_facility_1  = ppia_trial) ///
+        i.case , vce(cluster fidcode)
+
+      est sto `var'
+      local labels `"`labels' "`:var label `var''" "'
+    }
+
+  prestack `anything' ///
+  , gen(medtype) cl(cluster) sd(sd)
+
+  ivregress 2sls medtype (ppia_facility_1  = ppia_trial) ///
+      i.case i.cluster [pweight = 1/sd] ///
+    , vce(cluster fidcode)
+
+  est sto aes
+
+  outwrite aes index `anything' ///
+    `using' ///
+    , modify col("AES" `labels') stats(N r2) sheet("TOT") drop(i.cluster)
+
+  // Results table: ITT + baseline (ANCOVA)
+  estimates clear
+  local labels ""
+  use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
+    merge m:1 fidcode using  `index' , keep(3) keepusing(index_bl) nogen
+
+    pca `anything'
+    predict index
+      lab var index "PCA"
+
+    gen lag = .
+      lab var lag "Lagged Outcome"
+
+    qui foreach var of varlist index `anything' {
+      replace lag = `var'_bl
+      reg `var' ppia_trial lag i.case , vce(cluster fidcode)
+
+      est sto `var'
+      local labels `"`labels' "`:var label `var''" "'
+    }
+
+  prestack `anything' ///
+  , gen(medtype) cl(cluster) sd(sd)
+
+  merge m:1 fidcode cluster using `aes' , keep(3) nogen
+  replace lag = medtype_bl
+
+  reg medtype ppia_trial lag i.case i.cluster [pweight = 1/sd] ///
+    , vce(cluster fidcode)
+
+  est sto aes
+
+  outwrite aes index `anything' ///
+    `using' ///
+    , modify col("AES" `labels') stats(N r2) sheet("ANCOVA") drop(i.cluster)
+
+  // Results table: Asthma
+  estimates clear
+  local labels ""
+  use "${git}/data/ayush-endline.dta" if ppia_trial != . & case == 7, clear
+
+    pca `anything'
+    predict index
+      lab var index "PCA"
+
+    qui foreach var of varlist index `anything' {
+      reg `var' ppia_trial i.case , vce(cluster fidcode)
+
+      est sto `var'
+      local labels `"`labels' "`:var label `var''" "'
+    }
+
+  prestack `anything' ///
+  , gen(medtype) cl(cluster) sd(sd)
+
+  reg medtype ppia_trial i.case i.cluster [pweight = 1/sd] ///
+    , vce(cluster fidcode)
+
+  est sto aes
+
+  outwrite aes index `anything' ///
+    `using' ///
+    , modify col("AES" `labels') stats(N r2) sheet("Asthma") drop(i.cluster)
+
+end
+
 // Stack data for rwolf, aes
 
 cap prog drop prestack
