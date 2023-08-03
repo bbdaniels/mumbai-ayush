@@ -1,7 +1,81 @@
 // Analysis for unlabeled medications
 
+********************************************************************************
+// Unlabelled medications string distances
+********************************************************************************
+
+
+
+********************************************************************************
+// Unlabelled medications KL divergence
+********************************************************************************
+
+  // Null distribution loop
+  cap prog drop kl_test
+  prog def kl_test , rclass
+
+    qui replace ppia_trial = runiform() > 0.5
+    kl
+    return scalar kl = r(kl)
+
+  end
+
+  // Baseline
+  use "${git}/data/ayush-baseline.dta" if ppia_trial != . & case < 7 , clear
+
+    kl
+    local result = `r(kl)'
+
+    simulate kl = r(kl) , ///
+      reps(1000) : kl_test
+
+    su kl
+      local mean = r(mean)
+    _pctile kl, p(2.5 97.5)
+
+    histogram kl ///
+    , frac width(0.005) ls(none) fc(black%50) barwidth(0.004) ///
+      xline(`result' , lc(black)) xline(`r(r1)' `r(r2)') xtit("") title("Baseline") ///
+      ytit("Distribution Under Null") ylab(0 "0%" .05 "5%") ///
+      xlab(`mean' "{&mu}" `r(r1)' "{&larr} {&alpha}/2" `result' "{&uarr}" `r(r2)' "{&alpha}/2 {&rarr} ")
+
+      graph save "${git}/outputs/kl-baseline.gph" , replace
+
+  // Endline
+  use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7 , clear
+
+    kl
+    local result = `r(kl)'
+
+    simulate kl = r(kl) , ///
+      reps(1000) : kl_test
+
+    su kl
+      local mean = r(mean)
+    _pctile kl, p(2.5 97.5)
+
+    histogram kl ///
+    , frac width(0.005) ls(none) fc(black%50) barwidth(0.004) ///
+      xline(`result' , lc(black)) xline(`r(r1)' `r(r2)') xtit("") title("Endline") ///
+      ytit("Distribution Under Null") ylab(0 "0%" .05 "5%") ///
+      xlab(`mean' "{&mu}" `r(r1)' "{&larr} {&alpha}/2" `result' "{&uarr}" `r(r2)' "{&alpha}/2 {&rarr} ")
+
+      graph save "${git}/outputs/kl-endline.gph" , replace
+
+  // Combine
+  graph combine ///
+  "${git}/outputs/kl-baseline.gph" ///
+  "${git}/outputs/kl-endline.gph" ///
+  , c(1)
+
+  graph export "${git}/outputs/kl-meds.pdf" , replace
+
+********************************************************************************
 // All medications regressions -- LASSO
-use "${git}/data/ayush-baseline.dta" , clear
+********************************************************************************
+
+  // Baseline
+  use "${git}/data/ayush-baseline.dta" , clear
 
   forest reg ///
     (any_antister) ///
@@ -23,7 +97,8 @@ use "${git}/data/ayush-baseline.dta" , clear
 
     graph save "${git}/outputs/lasso-baseline-othermeds.gph" , replace
 
-use "${git}/data/ayush-endline.dta" , clear
+  // Endline
+  use "${git}/data/ayush-endline.dta" , clear
 
   forest lasso linear ///
     (any_antister) ///
@@ -45,17 +120,20 @@ use "${git}/data/ayush-endline.dta" , clear
 
     graph save "${git}/outputs/lasso-endline-othermeds.gph" , replace
 
-    graph combine ///
-    "${git}/outputs/lasso-baseline-othermeds.gph" ///
-    "${git}/outputs/lasso-baseline-antister.gph" ///
-    "${git}/outputs/lasso-endline-othermeds.gph" ///
-    "${git}/outputs/lasso-endline-antister.gph" ///
-    , altshrink ycom
+  // Combine
+  graph combine ///
+  "${git}/outputs/lasso-baseline-othermeds.gph" ///
+  "${git}/outputs/lasso-baseline-antister.gph" ///
+  "${git}/outputs/lasso-endline-othermeds.gph" ///
+  "${git}/outputs/lasso-endline-antister.gph" ///
+  , altshrink xcom
 
-    graph export "${git}/outputs/lasso-meds.pdf" , replace
+  graph export "${git}/outputs/lasso-meds.pdf" , replace
 
-
+********************************************************************************
 // All medications regressions -- AES
+********************************************************************************
+
 use "${git}/data/ayush-endline.dta" , clear
 
 local variables ///
@@ -90,64 +168,5 @@ local variables ///
 
   reg medtype ppia_trial i.case i.cluster [pweight = 1/sd] ///
   , vce(cluster cluster fidcode)
-
-
-
-
-// Medicine level
-/*
-use "${git}/data/sp-ayush.dta" if round == 2, clear
-
-
-  keep med_k_* med_l_* case med_b2* ppia_trial
-
-  gen uid = _n
-
-  reshape long med_k_ med_l_ med_b2_ , i(uid) j(med)
-    ren med_k_ type
-    ren med_l_ anti
-    ren med_b2_ desc
-
-    replace anti = 3 if type == 6 & anti == .
-
-  drop *any*
-  drop if type == .
-  replace type = 50 if type == 0
-
-  keep if ppia_trial < .
-  keep if type == 1
-
-  preserve
-    keep desc
-    ren desc desc2
-    tempfile blank
-    save `blank'
-  restore
-    cross using `blank'
-    strdist desc desc2
-
-  cap prog drop rstringer
-  prog def rstringer , rclass
-  preserve
-    bsample
-    su strdist
-    return scalar mean = r(mean)
-  restore
-  end
-
-  simulate m = r(mean) ///
-    , reps(100) : rstringer
-
-  preserve
-  keep if ppia_trial == 0
-    keep desc
-    ren desc desc2
-    tempfile treat
-    save `treat'
-  restore
-  keep if ppia_trial == 1
-  cross using `treat'
-  strdist desc desc2
-*/
 
 // End
