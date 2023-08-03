@@ -2,7 +2,7 @@
 // Medicine usage and combinations
 ********************************************************************************
 
-use "${git}/data/sp-ayush.dta" , clear
+use "${git}/data/ayush-long.dta" , clear
 
   foreach var of varlist med_k_any_* med_l_any_* {
     local label : var lab `var'
@@ -137,7 +137,7 @@ use "${git}/data/sp-ayush.dta" , clear
   forest reg ///
     (med_k_any_1 med_k_any_4 med_k_any_5 med_k_any_7 ///
     med_k_any_8 med_k_any_10 med_k_any_13 ///
-    med_k_any_16 med_k_any_17 med_k_any_50) ///
+    med_k_any_16 med_k_any_17) ///
      , t(ppia_trial) c(i.case) bh ///
        graph(xtit("Standardized Balance") title("Baseline Balance") ///
        xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
@@ -170,7 +170,7 @@ use "${git}/data/sp-ayush.dta" , clear
   forest lasso linear ///
     (med_k_any_1 med_k_any_4 med_k_any_5 med_k_any_7 ///
     med_k_any_8 med_k_any_10 med_k_any_13 ///
-    med_k_any_16 med_k_any_17 med_k_any_50) ///
+    med_k_any_16 med_k_any_17) ///
      , t((ppia_trial)) c(i.case *bl) bh ///
        graph( xtit("Standardized ITT") title("Endline LASSO") ///
        xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d

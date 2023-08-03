@@ -3,8 +3,20 @@ cap prog drop ayushreg
 prog def ayushreg
 syntax anything using
 
+  local rw = subinstr(`"`using'"',".xlsx","-rw.xlsx",.)
+
   // Baseline regression
   use "${git}/data/ayush-baseline.dta" if ppia_trial != . & case < 7, clear
+
+  rwolf `anything' ///
+    , method(regress) ///
+      indepvar(ppia_trial) controls(i.case) ///
+      vce(cluster fidcode) cluster(fidcode)
+
+      mat result = e(RW)'
+
+      outwrite result `rw' ///
+      , replace col(`labels') sheet("Baseline")
 
   pca `anything'
   predict index
@@ -47,6 +59,16 @@ syntax anything using
   local labels ""
   use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
 
+  rwolf `anything' ///
+    , method(regress) ///
+      indepvar(ppia_trial) controls(i.case) ///
+      vce(cluster fidcode) cluster(fidcode)
+
+      mat result = e(RW)'
+
+      outwrite result `rw' ///
+      , modify col(`labels') sheet("ITT")
+
     pca `anything'
     predict index
       lab var index "PCA"
@@ -75,6 +97,15 @@ syntax anything using
   local labels ""
   use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
 
+  rwolf `anything' ///
+    , method(ivregress) iv(ppia_trial) ///
+      indepvar(ppia_facility_1) controls(round i.case) ///
+      vce(cluster fidcode) cluster(fidcode)
+
+    mat result = e(RW)'
+    outwrite result `rw' ///
+    , modify col(`labels') sheet("TOT")
+
     pca `anything'
     predict index
       lab var index "PCA"
@@ -85,6 +116,8 @@ syntax anything using
         i.case , vce(cluster fidcode)
 
       est sto `var'
+      estat firststage, all
+        estadd scalar f1 = r(singleresults)[1,4] :`var'
       local labels `"`labels' "`:var label `var''" "'
     }
 
@@ -99,12 +132,34 @@ syntax anything using
 
   outwrite aes index `anything' ///
     `using' ///
-    , modify col("AES" `labels') stats(N r2) sheet("TOT") drop(i.cluster)
+    , modify col("AES" `labels') stats(N r2 f1) sheet("TOT") drop(i.cluster)
 
   // Results table: ITT + baseline (ANCOVA)
   estimates clear
   local labels ""
-  use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
+    clear
+    tempfile x
+    save `x' , emptyok
+
+    qui foreach var in `anything' {
+      use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
+      keep `var' ppia_trial case fidcode `var'_bl
+        ren `var'_bl lag
+        append using `x'
+        save `x' , replace
+    }
+
+    rwolf `anything' ///
+      , method(regress) ///
+        indepvar(ppia_trial) controls(lag i.case) ///
+        vce(cluster fidcode) cluster(fidcode)
+
+        mat result = e(RW)'
+
+        outwrite result `rw' ///
+        , modify col(`labels') sheet("ANCOVA")
+
+    use "${git}/data/ayush-endline.dta" if ppia_trial != . & case < 7, clear
     merge m:1 fidcode using  `index' , keep(3) keepusing(index_bl) nogen
 
     pca `anything'
@@ -142,6 +197,16 @@ syntax anything using
   local labels ""
   use "${git}/data/ayush-endline.dta" if ppia_trial != . & case == 7, clear
 
+  rwolf `anything' ///
+    , method(regress) ///
+      indepvar(ppia_trial) controls(i.case) ///
+      vce(cluster fidcode) cluster(fidcode)
+
+      mat result = e(RW)'
+
+      outwrite result `rw' ///
+      , modify col(`labels') sheet("Asthma")
+
     pca `anything'
     predict index
       lab var index "PCA"
@@ -167,7 +232,7 @@ syntax anything using
 
 end
 
-// Stack data for rwolf, aes
+// Stack data for AES
 
 cap prog drop prestack
 prog def prestack
