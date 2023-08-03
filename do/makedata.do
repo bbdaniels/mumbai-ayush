@@ -1,10 +1,7 @@
 // Construct release ready data
 
 // Ayush SP data
-use "${box}/sp-wave-0.dta" , clear
-    ren g_* g*
-  append using "${box}/sp-wave-1.dta" , gen(round) force
-    recode g6-g10 (1/2=0)(3/max=1)
+use "${git}/raw/sp-raw.dta" , clear
 
   replace ppia_facility_1 = 1 if ppia_facility_0 == 1
 
@@ -31,10 +28,8 @@ use "${box}/sp-wave-0.dta" , clear
   ren qutub_id fid
   drop qutub*
 
-  merge m:1 fid using "${git}/data/codefile.dta" , keep(3) nogen
+  merge m:1 fid using "${git}/raw/codefile.dta" , keep(3) nogen
   replace dr_4 = 0 if dr_4 == 3
-
-  drop *given
 
   egen fidcode = group(fid)
     lab var fidcode "Provider Code"
@@ -59,14 +54,12 @@ use "${box}/sp-wave-0.dta" , clear
   duplicates drop round fidcode case, force
 
   // Save two-period data
-  iecodebook export ///
-    using "${git}/data/ayush-long.xlsx" ///
-    , save sign reset replace
+  save "${git}/data/ayush-long.dta" , replace
 
   // Save baseline data
   preserve
     keep if round == 1
-      merge 1:1 form using "${git}/data/baseline-unlab.dta" , keep(1 3) nogen
+      merge 1:1 form using "${git}/raw/baseline-unlab.dta" , keep(1 3) nogen
       replace med_unl_anti = 0 if med_unl_anti == .
         lab var med_unl_anti "Unlabelled Antibiotic"
       replace med_unl_ster = 0 if med_unl_ster == .
@@ -104,11 +97,11 @@ use "${box}/sp-wave-0.dta" , clear
 
   // Save endline data
   keep if round == 2
-    merge 1:1 form using "/Users/bbdaniels/Library/CloudStorage/Box-Box/Qutub/MUMBAI/data/public/Wave-1/sp1_4.dta" ///
+    merge 1:1 form using "${git}/raw/endline-unlabelled.dta" ///
       , keepusing(med_b2*) update replace keep(1 3 4 5) nogen
 
     merge m:1 fidcode using `baseline' , keep(1 3) nogen
-    merge 1:1 form using "${git}/data/endline-unlab.dta" , nogen
+    merge 1:1 form using "${git}/raw/endline-unlab.dta" , nogen
       replace med_unl_anti = 0 if med_unl_anti == .
         lab var med_unl_anti "Unlabelled Antibiotic"
       replace med_unl_ster = 0 if med_unl_ster == .
@@ -158,7 +151,6 @@ use "https://github.com/bbdaniels/mumbai-public/raw/main/constructed/sp-data.dta
   predict index_good
     lab var index_good "TB Testing Index"
 
-  iecodebook export ///
-    using "${git}/data/sp-pubpri.xlsx" ///
-    , save sign reset replace
+  save "${git}/data/sp-pubpri.dta" , replace
+
 // End

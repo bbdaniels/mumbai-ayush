@@ -1,14 +1,33 @@
-// Prep non-shareable data
+// Prep non-shareable SP data
+
+use "${box}/sp-wave-0.dta" , clear
+    ren g_* g*
+  append using "${box}/sp-wave-1.dta" , gen(round) force
+    recode g6-g10 (1/2=0)(3/max=1)
+
+  drop *given
+
+  iecodebook export ///
+    using "${git}/raw/sp-raw.xlsx" ///
+    , save sign reset replace
+
+use "${aux}/data/public/Wave-1/sp1_4.dta" , clear
+  keep form med_b2*
+
+  iecodebook export ///
+    using "${git}/raw/endline-unlabelled.xlsx" ///
+    , save sign reset replace
 
 // Baseline unlabelled medications
 import excel using "${aux}/data/raw/wave-0/Med Cleaning/Unlabelled_Entry.Devinder.xlsx" , clear first
   drop in 1/2
 
-  save "${git}/data/baseline-unlab.dta" , replace
+  tempfile unlab1
+  save `unlab1'
 
 import excel using "${aux}/data/raw/wave-0/Med Cleaning/Unlabelled_Entry.Purshottam.xlsx" , clear first
   drop in 1/2
-  append using "${git}/data/baseline-unlab.dta"
+  append using `unlab1'
 
   drop if form == ""
   keep form med_k_
@@ -19,7 +38,9 @@ import excel using "${aux}/data/raw/wave-0/Med Cleaning/Unlabelled_Entry.Purshot
   egen med_unl_anti = anymatch(med_k_?) , v(6)
   egen med_unl_ster = anymatch(med_k_?) , v(9)
 
-  save "${git}/data/baseline-unlab.dta" , replace
+  iecodebook export ///
+    using "${git}/raw/baseline-unlab.xlsx" ///
+    , save sign reset replace
 
 // Endline unlabelled medications
 import excel using "${aux}/data/raw/wave-1/Med Cleaning/Unlabelled_Entry.Template_iserdd.xlsx" , clear first
@@ -35,8 +56,9 @@ import excel using "${aux}/data/raw/wave-1/Med Cleaning/Unlabelled_Entry.Templat
   egen med_unl_anti = anymatch(med_k_?) , v(6)
   egen med_unl_ster = anymatch(med_k_?) , v(9)
 
-  save "${git}/data/endline-unlab.dta" , replace
-
+  iecodebook export ///
+    using "${git}/raw/endline-unlab.xlsx" ///
+    , save sign reset replace
 
 // PPIA data
 use "/Users/bbdaniels/Library/CloudStorage/Box-Box/Qutub/MUMBAI/constructed/ppia-patients.dta" , clear
@@ -55,7 +77,7 @@ use "${box}/Master_Code_File.dta" , clear
   ren qutub_id fid
 
   iecodebook export ///
-    using "${git}/data/codefile.xlsx" ///
+    using "${git}/raw/codefile.xlsx" ///
     , save sign reset replace
 
 // End
