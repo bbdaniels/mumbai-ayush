@@ -111,14 +111,24 @@ use "${git}/data/ayush-long.dta" , clear
 // All medications regressions -- LASSO
 ********************************************************************************
 
+
   // Baseline
   use "${git}/data/ayush-baseline.dta" , clear
+
+  forest reg ///
+    (med med_any med_dispense ///
+    p_2 p_2a p_2b) ///
+    , t(ppia_trial) c(i.case) bh  ///
+      graph(xtit("Difference") title("Baseline Balance") ///
+      xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note(""))
+
+  graph save "${git}/outputs/lasso-baseline-allmeds.gph" , replace
 
   forest reg ///
     (correct dr_4 re_1 re_3 ///
     checklist time p index_sub g11) ///
     , t(ppia_trial) c(i.case) bh  ///
-      graph(xtit("Standardized Balance") title("Baseline Balance") ///
+      graph(xtit("Standardized Difference") title("Baseline Balance") ///
       xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
 
     graph save "${git}/outputs/lasso-baseline-quality.gph" , replace
@@ -129,8 +139,8 @@ use "${git}/data/ayush-long.dta" , clear
     any_steroid med_unl_ster med_k_any_9 ///
     med_l_any_2 med_l_any_3) ///
     , t(ppia_trial) c(i.case) bh  ///
-      graph(xtit("Standardized Balance") title("Baseline Balance") ///
-      xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
+      graph(xtit("Percent Difference") title("Baseline Balance") ///
+      xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
 
     graph save "${git}/outputs/lasso-baseline-antister.gph" , replace
 
@@ -139,8 +149,8 @@ use "${git}/data/ayush-long.dta" , clear
     med_k_any_8 med_k_any_10 med_k_any_13 ///
     med_k_any_16 med_k_any_17) ///
      , t(ppia_trial) c(i.case) bh ///
-       graph(xtit("Standardized Balance") title("Baseline Balance") ///
-       xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
+       graph(xtit("Percent Difference") title("Baseline Balance") ///
+       xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
 
     graph save "${git}/outputs/lasso-baseline-othermeds.gph" , replace
 
@@ -148,10 +158,19 @@ use "${git}/data/ayush-long.dta" , clear
   use "${git}/data/ayush-endline.dta" , clear
 
   forest lasso linear ///
+    (med med_any med_dispense ///
+    p_2 p_2a p_2b) ///
+    , t((ppia_trial)) c(i.case *bl) bh  ///
+      graph(xtit("ITT Difference") title("Endline LASSO") ///
+      xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note(""))
+
+  graph save "${git}/outputs/lasso-endline-allmeds.gph" , replace
+
+  forest lasso linear ///
     (correct dr_4 re_1 re_3 ///
     checklist time p index_sub g11) ///
     , t((ppia_trial)) c(i.case *bl) bh ///
-      graph(xtit("Standardized ITT") title("Endline LASSO") ///
+      graph(xtit("ITT Standardized Difference") title("Endline LASSO") ///
       xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
 
     graph save "${git}/outputs/lasso-endline-quality.gph" , replace
@@ -162,8 +181,8 @@ use "${git}/data/ayush-long.dta" , clear
     any_steroid med_unl_ster med_k_any_9 ///
     med_l_any_2 med_l_any_3) ///
     , t((ppia_trial)) c(i.case *bl) bh ///
-      graph(xtit("Standardized ITT") title("Endline LASSO") ///
-      xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
+      graph(xtit("ITT Percent Difference") title("Endline LASSO") ///
+      xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
 
     graph save "${git}/outputs/lasso-endline-antister.gph" , replace
 
@@ -172,21 +191,28 @@ use "${git}/data/ayush-long.dta" , clear
     med_k_any_8 med_k_any_10 med_k_any_13 ///
     med_k_any_16 med_k_any_17) ///
      , t((ppia_trial)) c(i.case *bl) bh ///
-       graph( xtit("Standardized ITT") title("Endline LASSO") ///
-       xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
+       graph(xtit("ITT Percent Difference") title("Endline LASSO") ///
+       xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
 
     graph save "${git}/outputs/lasso-endline-othermeds.gph" , replace
 
   // Combine
   graph combine ///
-  "${git}/outputs/lasso-baseline-othermeds.gph" ///
-  "${git}/outputs/lasso-baseline-antister.gph" ///
   "${git}/outputs/lasso-baseline-quality.gph" ///
-  "${git}/outputs/lasso-endline-othermeds.gph" ///
-  "${git}/outputs/lasso-endline-antister.gph" ///
+  "${git}/outputs/lasso-baseline-othermeds.gph" ///
   "${git}/outputs/lasso-endline-quality.gph" ///
-  , altshrink xcom c(3)
+  "${git}/outputs/lasso-endline-othermeds.gph" ///
+  , altshrink c(2)
 
-  graph export "${git}/outputs/f-balance-lasso.pdf" , replace
+  graph export "${git}/outputs/f-balance-lasso-1.pdf" , replace
+
+  graph combine ///
+  "${git}/outputs/lasso-baseline-allmeds.gph" ///
+  "${git}/outputs/lasso-baseline-antister.gph" ///
+  "${git}/outputs/lasso-endline-allmeds.gph" ///
+  "${git}/outputs/lasso-endline-antister.gph" ///
+  , altshrink c(2)
+
+  graph export "${git}/outputs/f-balance-lasso-2.pdf" , replace
 
 // End

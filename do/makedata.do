@@ -21,6 +21,10 @@ use "${git}/raw/sp-raw.dta" , clear
   lab var time "Duration (Mins)"
   lab var g11 "SP Provider Rating"
 
+  egen med_dispense = rowmean(med_a_*)
+    replace med_dispense = 2-med_dispense
+    lab var med_dispense "Proportion Dispensed"
+
   replace round = round + 1
   lab def round 1 "Round 1" 2 "Round 2"
     lab val round round
@@ -33,6 +37,13 @@ use "${git}/raw/sp-raw.dta" , clear
 
   egen fidcode = group(fid)
     lab var fidcode "Provider Code"
+
+  replace med_any = med > 0
+
+  replace p_2b = p_2b/100
+    lab var p_2b "Meds Price (x100)"
+    lab var p_2 "Meds Price Known"
+    lab var p_2a "Meds Itemized"
 
   pca g1-g10
   predict index_sub
