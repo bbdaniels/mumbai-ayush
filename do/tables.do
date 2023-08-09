@@ -26,17 +26,20 @@ qui ayushreg ///
   any_antibio med_unl_anti med_k_any_6 ///
   any_steroid med_unl_ster med_k_any_9 ///
   med_l_any_2 med_l_any_3 ///
-  using "${git}/outputs/t-antister.xlsx"
+  using "${git}/outputs/t-antister.xlsx" ///
+  , reps(1000)
 
 qui ayushreg ///
   med_k_any_1 med_k_any_4 med_k_any_5 med_k_any_7 ///
   med_k_any_8 med_k_any_10 med_k_any_13 ///
   med_k_any_16 med_k_any_17 ///
-  using "${git}/outputs/t-medications.xlsx"
+  using "${git}/outputs/t-medications.xlsx" ///
+  , reps(1000)
 
 qui ayushreg  ///
   correct dr_4 re_1 re_3 ///
   checklist time p index_sub g11 ///
-  using "${git}/outputs/t-quality.xlsx"
+  using "${git}/outputs/t-quality.xlsx" ///
+  , reps(1000)
 
 // End

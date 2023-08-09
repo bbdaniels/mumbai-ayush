@@ -1,7 +1,7 @@
 // Regression setup
 cap prog drop ayushreg
 prog def ayushreg
-syntax anything using
+syntax anything using , Reps(passthru)
 
   local rw = subinstr(`"`using'"',".xlsx","-rw.xlsx",.)
 
@@ -11,7 +11,7 @@ syntax anything using
   rwolf `anything' ///
     , method(regress) ///
       indepvar(ppia_trial) controls(i.case) ///
-      vce(cluster fidcode) cluster(fidcode)
+      vce(cluster fidcode) cluster(fidcode) `reps'
 
       mat result = e(RW)'
 
@@ -62,7 +62,7 @@ syntax anything using
   rwolf `anything' ///
     , method(regress) ///
       indepvar(ppia_trial) controls(i.case) ///
-      vce(cluster fidcode) cluster(fidcode)
+      vce(cluster fidcode) cluster(fidcode) `reps'
 
       mat result = e(RW)'
 
@@ -100,7 +100,7 @@ syntax anything using
   rwolf `anything' ///
     , method(ivregress) iv(ppia_trial) ///
       indepvar(ppia_facility_1) controls(round i.case) ///
-      vce(cluster fidcode) cluster(fidcode)
+      vce(cluster fidcode) cluster(fidcode) `reps'
 
     mat result = e(RW)'
     outwrite result `rw' ///
@@ -152,7 +152,7 @@ syntax anything using
     rwolf `anything' ///
       , method(regress) ///
         indepvar(ppia_trial) controls(lag i.case) ///
-        vce(cluster fidcode) cluster(fidcode)
+        vce(cluster fidcode) cluster(fidcode) `reps'
 
         mat result = e(RW)'
 
@@ -200,7 +200,7 @@ syntax anything using
   rwolf `anything' ///
     , method(regress) ///
       indepvar(ppia_trial) controls(i.case) ///
-      vce(cluster fidcode) cluster(fidcode)
+      vce(cluster fidcode) cluster(fidcode) `reps'
 
       mat result = e(RW)'
 

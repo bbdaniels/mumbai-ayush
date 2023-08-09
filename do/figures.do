@@ -2,7 +2,7 @@
 // Medicine usage and combinations
 ********************************************************************************
 
-use "${git}/data/ayush-long.dta" , clear
+use "${git}/data/ayush-long.dta" if case < 7, clear
 
   foreach var of varlist med_k_any_* med_l_any_* {
     local label : var lab `var'
