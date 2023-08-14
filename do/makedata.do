@@ -92,11 +92,14 @@ use "${git}/raw/sp-raw.dta" , clear
 
     // Create wide version
     labelcollapse (mean) ///
-      correct dr_4 re_1 re_3   ///
+      ppia_trial correct dr_4 re_1 re_3   ///
       checklist time p index_sub g11 ///
       med_unl_anti med_unl_ster ///
       any_antister any_antibio any_steroid ///
-      med_k_any_? med_k_any_?? med_l_any_? ///
+      med_k_any_1 med_k_any_4 med_k_any_8 med_k_any_10  ///
+      med_k_any_5 med_k_any_7 med_k_any_13 ///
+      med_k_any_16 med_k_any_17 ///
+      med_k_any_6 med_k_any_9 med_l_any_2 med_l_any_3 ///
       , by(fidcode) fast
 
       ren * *_bl
@@ -111,7 +114,6 @@ use "${git}/raw/sp-raw.dta" , clear
     merge 1:1 form using "${git}/raw/endline-unlabelled.dta" ///
       , keepusing(med_b2*) update replace keep(1 3 4 5) nogen
 
-    merge m:1 fidcode using `baseline' , keep(1 3) nogen
     merge 1:1 form using "${git}/raw/endline-unlab.dta" , nogen
       replace med_unl_anti = 0 if med_unl_anti == .
         lab var med_unl_anti "Unlabelled Antibiotic"
@@ -129,7 +131,13 @@ use "${git}/raw/sp-raw.dta" , clear
     gen any_antister = (any_steroid == 1 | any_antibio == 1)
       lab var any_antister "Any Antibiotic or Steroid"
 
+      merge m:1 fidcode using `baseline'
+
   order * , seq
+    replace ppia_trial = ppia_trial_bl if ppia_trial == .
+  save "${git}/data/ayush-heckman.dta", replace
+  drop if _merge == 2
+    drop _merge
   save "${git}/data/ayush-endline.dta", replace
 
 // Public sector and hospital data

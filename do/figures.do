@@ -213,4 +213,58 @@ use "${git}/data/ayush-long.dta" if case < 7, clear
 
   graph export "${git}/outputs/f-balance-lasso-2.pdf" , replace
 
+// Heckman
+use "${git}/data/ayush-heckman.dta" if ppia_trial != . , clear
+
+drop med_k_any_6_bl med_k_any_9_bl med_l_any_2_bl med_l_any_3_bl ///
+     any_antister_bl any_antibio_bl med_unl_anti_bl any_steroid_bl med_unl_ster_bl
+
+  forest heckman  ///
+  (med med_any med_dispense p_2 p_2a p_2b) ///
+    , rhs(ppia_trial i.case) reg(two select(*bl)) bh ///
+      graph(xtit("ITT Difference") title("Endline Heckman") ///
+      xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note(""))
+
+      graph save "${git}/outputs/lasso-heckman-allmeds.gph" , replace
+
+  forest heckman  ///
+    (any_antister ///
+    any_antibio med_unl_anti med_k_any_6 ///
+    any_steroid med_unl_ster med_k_any_9 ///
+    med_l_any_2 med_l_any_3) ///
+    , rhs(ppia_trial i.case) reg(two select(*bl)) bh ///
+      graph(xtit("ITT Percent Difference") title("Endline Heckman") ///
+      xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
+
+      graph save "${git}/outputs/lasso-heckman-antister.gph" , replace
+
+
+  forest heckman  ///
+  (correct dr_4 re_1 re_3 checklist time p index_sub g11) ///
+    , rhs(ppia_trial i.case) reg(two select(*bl)) bh ///
+    graph(xtit("ITT Standardized Difference") title("Endline Heckman") ///
+    xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
+
+      graph save "${git}/outputs/lasso-heckman-quality.gph" , replace
+
+
+  forest heckman  ///
+  (med_k_any_1 med_k_any_4 med_k_any_5 med_k_any_7 ///
+  med_k_any_8 med_k_any_10 med_k_any_13 ///
+  med_k_any_16 med_k_any_17) ///
+    , rhs(ppia_trial i.case) reg(two select(*bl)) bh ///
+      graph(xtit("ITT Percent Difference") title("Endline Heckman") ///
+      xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
+
+      graph save "${git}/outputs/lasso-heckman-othermeds.gph" , replace
+
+      graph combine ///
+      "${git}/outputs/lasso-heckman-quality.gph" ///
+      "${git}/outputs/lasso-heckman-othermeds.gph" ///
+      "${git}/outputs/lasso-heckman-allmeds.gph" ///
+      "${git}/outputs/lasso-heckman-antister.gph" ///
+      , altshrink c(2)
+
+      graph export "${git}/outputs/f-heckman.pdf" , replace
+
 // End
