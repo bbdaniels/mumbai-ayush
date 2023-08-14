@@ -118,7 +118,7 @@ use "${git}/data/ayush-long.dta" if case < 7, clear
   forest reg ///
     (med med_any med_dispense ///
     p_2 p_2a p_2b) ///
-    , t(ppia_trial) c(i.case) bh  ///
+    , rhs(ppia_trial i.case) bh  ///
       graph(xtit("Difference") title("Baseline Balance") ///
       xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note(""))
 
@@ -127,7 +127,7 @@ use "${git}/data/ayush-long.dta" if case < 7, clear
   forest reg ///
     (correct dr_4 re_1 re_3 ///
     checklist time p index_sub g11) ///
-    , t(ppia_trial) c(i.case) bh  ///
+    , rhs(ppia_trial i.case) bh  ///
       graph(xtit("Standardized Difference") title("Baseline Balance") ///
       xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d
 
@@ -138,7 +138,7 @@ use "${git}/data/ayush-long.dta" if case < 7, clear
     any_antibio med_unl_anti med_k_any_6 ///
     any_steroid med_unl_ster med_k_any_9 ///
     med_l_any_2 med_l_any_3) ///
-    , t(ppia_trial) c(i.case) bh  ///
+    , rhs(ppia_trial i.case) bh  ///
       graph(xtit("Percent Difference") title("Baseline Balance") ///
       xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
 
@@ -148,7 +148,7 @@ use "${git}/data/ayush-long.dta" if case < 7, clear
     (med_k_any_1 med_k_any_4 med_k_any_5 med_k_any_7 ///
     med_k_any_8 med_k_any_10 med_k_any_13 ///
     med_k_any_16 med_k_any_17) ///
-     , t(ppia_trial) c(i.case) bh ///
+    , rhs(ppia_trial i.case) bh  ///
        graph(xtit("Percent Difference") title("Baseline Balance") ///
        xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note(""))
 
