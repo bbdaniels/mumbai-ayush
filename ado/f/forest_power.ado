@@ -6,7 +6,7 @@ syntax anything [if] [in], ///
   at(string asis) ///
   [reps(integer 10000)] ///
   [seed(integer 123456)] ///
-  [graph_opts(string asis)] ///
+  [GRAPHopts(string asis)] ///
   [Saving(string asis)] /// Save table
   [noms] /// no details
   [*] // Options to pass to [forest]
@@ -91,7 +91,7 @@ if "`ms'" == "" {
 else {
   tw `g1' , legend(on pos(3) size(small) symxsize(small) order(`legend')) ///
     title("Power (vs N = `nn')") ylab(0 "0%" .2 "20%" .4 "40%" .6 "60%" .8 "80%" 1 "100%") yline(0.8) ///
-    xtit("Sample Size Multiple") ytit("") xscale(r(1)) xlab(#6) legend(size(small))
+    xtit("Sample Size Multiple") ytit("") xscale(r(1)) xlab(#6) legend(size(small)) `graphopts'
 }
 
 }

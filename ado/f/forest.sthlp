@@ -19,9 +19,9 @@ will return incorrect values.
 
 {title:Syntax}
 
-{p 2 3}{cmd: forest} {it:estimator} ({it:depvar family}) [({it:depvar family})] [...]
+{p 2 4}{cmd: forest} {it:estimator} ({it:depvar family}) [({it:depvar family})] [...]
 {break} [{help weight}] [{help if}] [{help in}]{p_end}
-{p 2 3}, {opth t:reatment(varname)} [{opth c:ontrols(varlist)}] [{it:estimation_opts}]
+{p 2 4}, {opth rhs:(varlist)} [{opt reg:opts(estimation options)}]
 {break} [{bf:or|d}] [{opt b:onferroni}|{opt bh}] [{opt mde}] [{opt crit:ical(value)}]
 {break} [{bf:sort}({it:local}|{it:global})] [{opth graph:opts(twoway_options)}] {p_end}
 
@@ -34,9 +34,8 @@ will return incorrect values.
 {synopt:{opt estimator}}Indicates the estimation command to be utilized.{p_end}{break}
 {synopt:({it:depvar family})}List the left-hand-side variables in families for error control.
 At least one family of dependent variables is required and the parentheses are required.{p_end}{break}
-{synopt:{opt t:reatment()}}List the independent variable of interest
-(and any material to follow the estimator and dependent variable and precede the controls, in case of commands like {help ivregress 2sls}).{p_end}{break}
-{synopt:{it:estimation_opts}}Specify any options needed for the estimator.{p_end}
+{synopt:{opt rhs()}}List the independent variable of interest, controls, and any other material as needed.{p_end}{break}
+{synopt:{opt reg:opts()}}Specify any options needed for the estimator.{p_end}
 {break}
 {p 4 2}{bf:Modelling Options}{p_end}{break}{break}
 {synopt:{opt c:ontrols()}}Specify control variables.

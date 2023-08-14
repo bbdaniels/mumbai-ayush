@@ -6,11 +6,11 @@ cap prog drop forest
 prog def forest
 
 // Syntax --------------------------------------------------------------------------------------
-syntax anything /// syntax – forest reg d1 d2 d3
+syntax anything /// syntax – forest command (d1 d2) [(d3)]
   [if] [in] [fw pw iw aw] ///
   , ///
-    Treatment(string asis) /// Open-ended to allow things like ivregress inputs
-    [Controls(string asis)] /// Any variable list of controls
+    RHS(string asis) /// Open-ended to allow things like ivregress inputs
+    [REGopts(string asis)] /// Any variable list of controls
     [or] /// odds-ratios: passes to regression command and orders log scale on chart
     [d]  /// cohen's d: standardizes all dependent variables before regression
     [mde] /// plot minimum detectable effects (based on Bonferroni)
@@ -29,6 +29,8 @@ qui {
 preserve
   marksample touse, novarlist
   keep if `touse'
+
+  local treatment : word 1 of `rhs'
 
   tempvar dv
   cap mat drop results
@@ -97,15 +99,14 @@ forvalues i = 1/`nStrings' {
     }
 
     // Replace any self-referenced controls here
-    local theseControls = subinstr("`controls'","@","`1'",.)
-    local treatment = subinstr("`treatment'","@","`1'",.)
+    local theseControls = subinstr("`rhs'","@","`1'",.)
 
     // Regression
-    `cmd' `1' `treatment' ///
+    `cmd' `1' ///
       `theseControls' ///
       `ifcond`i'' ///
       [`weight'`exp'] ///
-      , `options' `or' `thisBonferroni'
+      , `regopts' `or' `thisBonferroni'
 
     // Store results
     mat a = r(table)'
