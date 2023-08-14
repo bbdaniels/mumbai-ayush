@@ -267,4 +267,56 @@ drop med_k_any_6_bl med_k_any_9_bl med_l_any_2_bl med_l_any_3_bl ///
 
       graph export "${git}/outputs/f-heckman.pdf" , replace
 
+// AIPW
+
+use "${git}/data/ayush-heckman.dta" if ppia_trial != . , clear
+
+drop med_k_any_6_bl med_k_any_9_bl med_l_any_2_bl med_l_any_3_bl ///
+     any_antister_bl any_antibio_bl med_unl_anti_bl any_steroid_bl med_unl_ster_bl
+
+  forest teffects aipw ///
+  (med med_any med_dispense p_2 ) ///
+  , rhs((@ *bl i.case)(ppia_trial *bl i.case)) bh ///
+  graph(xtit("ITT Difference") title("Endline AIPW") ///
+  xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) nix
+
+    graph save "${git}/outputs/lasso-aipw-allmeds.gph" , replace
+
+  forest teffects aipw ///
+  (any_antister ///
+  any_antibio med_unl_anti med_k_any_6 ///
+  any_steroid med_unl_ster med_k_any_9 ///
+  med_l_any_2 med_l_any_3) ///
+  , rhs((@ *bl i.case)(ppia_trial *bl i.case)) bh ///
+   graph(xtit("ITT Percent Difference") title("Endline AIPW") ///
+   xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note("")) nix
+
+   graph save "${git}/outputs/lasso-aipw-antister.gph" , replace
+
+  forest teffects aipw ///
+  (correct dr_4 re_1 re_3 checklist time p index_sub g11) ///
+  , rhs((@ *bl i.case)(ppia_trial *bl i.case)) bh ///
+    graph(xtit("ITT Standardized Difference") title("Endline AIPW") ///
+    xlab(0 "0" -.25 "-0.25" .25 "+0.25") xoverhang note("")) d nix
+
+  graph save "${git}/outputs/lasso-aipw-quality.gph" , replace
+
+  forest teffects aipw ///
+  (med_k_any_1 med_k_any_4 med_k_any_5 med_k_any_7 ///
+  med_k_any_8 med_k_any_10 med_k_any_13 ///
+  med_k_any_16 med_k_any_17) ///
+  , rhs((@ *bl i.case)(ppia_trial *bl i.case)) bh ///
+  graph(xtit("ITT Percent Difference") title("Endline APIW") ///
+  xlab(0 "0" -.1 "-10%" .1 "+10%") xoverhang note("")) nix
+
+  graph save "${git}/outputs/lasso-aipw-othermeds.gph" , replace
+
+  graph combine ///
+  "${git}/outputs/lasso-aipw-quality.gph" ///
+  "${git}/outputs/lasso-aipw-othermeds.gph" ///
+  "${git}/outputs/lasso-aipw-allmeds.gph" ///
+  "${git}/outputs/lasso-aipw-antister.gph" ///
+  , altshrink c(2)
+
+  graph export "${git}/outputs/f-aipw.pdf" , replace
 // End

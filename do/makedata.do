@@ -135,6 +135,7 @@ use "${git}/raw/sp-raw.dta" , clear
 
   order * , seq
     replace ppia_trial = ppia_trial_bl if ppia_trial == .
+    drop ppia_trial_bl
   save "${git}/data/ayush-heckman.dta", replace
   drop if _merge == 2
     drop _merge
