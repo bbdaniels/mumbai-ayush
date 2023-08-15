@@ -21,7 +21,7 @@ ieboilstart, v(16.1) adopath("${git}/ado" , strict)
     net install betterbar
     net install sumstats
     net install outwrite
-    net install forest
+    net install forest, replace
 
 // Graph scheming
 
